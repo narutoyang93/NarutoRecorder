@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--文件列表页面按钮样式-->
+    <style name="file_list_button">
+        <item name="android:drawableTint">@color/enable_red_gray</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textSize">@dimen/size_10sp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/enable_red_gray</item>
+    </style>
+</resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true">
+        <shape android:innerRadiusRatio="2.125" android:shape="ring" android:thicknessRatio="34" android:useLevel="false">
+            <gradient android:centerColor="@color/control" android:endColor="#FFCCCC" android:startColor="#FF9966" />
+        </shape>
+    </item>
+
+    <item>
+        <shape android:innerRadiusRatio="2.125" android:shape="ring" android:thicknessRatio="34" android:useLevel="false">
+            <solid android:color="@color/gray" />
+        </shape>
+    </item>
+
+</selector>

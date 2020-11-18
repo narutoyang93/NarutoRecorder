@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="value"
+            type="String" />
+    </data>
+
+    <LinearLayout
+        style="@style/bg_dialog"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/title_dialog"
+            android:text="保存录音" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/size_1dp"
+            android:background="@color/colorLine" />
+
+        <include
+            layout="@layout/edit_text"
+            app:value="@={value}" />
+
+        <Button
+            android:id="@+id/btn_save"
+            style="@style/button_dialog"
+            android:layout_marginTop="@dimen/size_20dp"
+            android:text="保存" />
+
+        <Button
+            android:id="@+id/btn_back"
+            style="@style/button_dialog"
+            android:layout_marginTop="@dimen/size_20dp"
+            android:text="返回" />
+
+        <Button
+            android:id="@+id/btn_delete"
+            style="@style/button_dialog"
+            android:layout_marginVertical="@dimen/size_20dp"
+            android:text="删除"
+            android:textColor="@android:color/holo_red_light" />
+    </LinearLayout>
+</layout>

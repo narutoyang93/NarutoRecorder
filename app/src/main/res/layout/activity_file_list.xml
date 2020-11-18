@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activity.FileListActivity">
+
+    <data>
+
+        <variable
+            name="isEditMode"
+            type="Boolean" />
+
+        <variable
+            name="selectedCount"
+            type="int" />
+
+        <variable
+            name="totalCount"
+            type="int" />
+
+        <import type="com.naruto.recorder.utils.DataBindingUtils" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ViewSwitcher
+            android:id="@+id/vs_title"
+            style="@style/title_bar_style"
+            android:tag="@string/title_bar_tag">
+
+            <include layout="@layout/title_bar" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_bottom_line">
+
+                <ImageView
+                    android:id="@+id/iv_close"
+                    style="@style/back_btn_style"
+                    android:onClick="quitEditMode"
+                    android:src="@drawable/ic_close"
+                    app:layout_constraintLeft_toLeftOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_1"
+                    style="@style/TextStyle_titleBar"
+                    android:text='@{selectedCount>0?"已选择":"未选择"}'
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/tv_2"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="已选择" />
+
+                <TextView
+                    android:id="@+id/tv_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/size_5dp"
+                    android:background="@drawable/rounded_corner_radius_999dp"
+                    android:gravity="center_horizontal"
+                    android:paddingHorizontal="@dimen/size_5dp"
+                    android:text='@{String.format("%d/%d",selectedCount,totalCount)}'
+                    android:textColor="#ffffff"
+                    android:textSize="@dimen/size_10sp"
+                    android:visibility="@{DataBindingUtils.isVisible(selectedCount>0)}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/tv_1"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="3" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ViewSwitcher>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/vs_title"
+            android:paddingVertical="@dimen/size_5dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_file" />
+
+        <ViewSwitcher
+            android:id="@+id/vs_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/size_10dp"
+            android:background="@drawable/rounded_corner_radius_999dp"
+            android:backgroundTint="#ffffff"
+            android:elevation="@dimen/size_10dp"
+            android:paddingHorizontal="@dimen/size_20dp"
+            android:paddingVertical="@dimen/size_2dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <TextView
+                    style="@style/file_list_button"
+                    android:drawableTop="@drawable/ic_add"
+                    android:onClick="newRecord"
+                    android:text="新录音" />
+
+                <TextView
+                    style="@style/file_list_button"
+                    android:layout_marginHorizontal="@dimen/size_30dp"
+                    android:drawableTop="@drawable/ic_edit"
+                    android:enabled="@{totalCount>0}"
+                    android:onClick="enterEditMode"
+                    android:text="编辑" />
+
+                <TextView
+                    style="@style/file_list_button"
+                    android:drawableTop="@drawable/ic_sort"
+                    android:enabled="@{totalCount>1}"
+                    android:onClick="sort"
+                    android:text="排序" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <TextView
+                    style="@style/file_list_button"
+                    android:drawableTop="@drawable/ic_share"
+                    android:enabled="@{selectedCount>0}"
+                    android:onClick="share"
+                    android:text="分享" />
+
+                <TextView
+                    style="@style/file_list_button"
+                    android:layout_marginHorizontal="@dimen/size_30dp"
+                    android:drawableTop="@drawable/ic_delete"
+                    android:enabled="@{selectedCount>0}"
+                    android:onClick="delete"
+                    android:text="删除" />
+
+                <TextView
+                    style="@style/file_list_button"
+                    android:drawableTop="@drawable/ic_edit"
+                    android:enabled="@{selectedCount==1}"
+                    android:onClick="rename"
+                    android:text="重命名" />
+
+                <TextView
+                    style="@style/file_list_button"
+                    setSelected="@{selectedCount==totalCount}"
+                    android:layout_marginLeft="@dimen/size_30dp"
+                    android:drawableTop="@drawable/select_toggle_selectall"
+                    android:onClick="selectAll"
+                    android:paddingBottom="0dp"
+                    android:text='@{selectedCount==totalCount?"取消全选":"全选",default="全选"}' />
+            </LinearLayout>
+
+        </ViewSwitcher>
+
+        <TextView
+            android:id="@+id/tv_no_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="暂无录音文件"
+            android:textSize="@dimen/size_20sp"
+            android:visibility="@{DataBindingUtils.isVisible(totalCount==0),default=gone}" />
+    </RelativeLayout>
+</layout>

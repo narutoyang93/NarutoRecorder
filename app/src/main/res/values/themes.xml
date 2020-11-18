@@ -1,0 +1,116 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.NarutoRecorder" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
+        <!-- Customize your theme here. -->
+        <item name="colorAccent">@color/theme</item>
+        <item name="colorPrimary">@color/material_grey_100</item>
+    </style>
+
+    <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorAccent">@color/theme</item>
+    </style>
+
+    <!--标题栏文本样式-->
+    <style name="TextStyle_titleBar">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textSize">@dimen/size_17sp</item>
+        <item name="android:textColor">#636363</item>
+    </style>
+
+    <!--标题栏样式-->
+    <style name="title_bar_style">
+        <item name="android:tag">@string/title_bar_tag</item>
+        <item name="android:id">@id/fl_titleBar</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="white_title_bar_style" parent="title_bar_style">
+        <item name="android:background">@drawable/bg_bottom_line</item>
+    </style>
+
+    <!--返回按钮样式-->
+    <style name="back_btn_style">
+        <item name="android:id">@id/iv_titleBar_back</item>
+        <item name="android:layout_width">@dimen/titleBarHeight</item>
+        <item name="android:layout_height">@dimen/titleBarHeight</item>
+        <item name="android:padding">@dimen/size_12dp</item>
+        <item name="android:src">@drawable/ic_back</item>
+        <item name="android:tint">#5D5D5D</item>
+    </style>
+
+    <!--文件列表页面按钮样式-->
+    <style name="file_list_button">
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textSize">@dimen/size_10sp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/enable_red_gray</item>
+    </style>
+
+    <!-- 默认弹窗样式-->
+    <style name="DefaultDialogStyle" parent="@android:style/Theme.Holo.Light.Dialog">
+        <!-- 窗口背景色（透明）-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--是否有覆盖-->
+        <item name="android:windowContentOverlay">@null</item>
+        <!-- 浮于Activity之上 -->
+        <item name="android:windowIsFloating">true</item>
+        <!-- 边框 -->
+        <item name="android:windowFrame">@null</item>
+        <!-- Dialog以外的区域模糊效果 -->
+        <item name="android:backgroundDimEnabled">true</item>
+        <!-- 无标题 -->
+        <item name="android:windowNoTitle">true</item>
+        <!-- 半透明 -->
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+    <style name="dialog_transparent" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!-- 窗口背景色（透明）-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <!--带输入框的弹窗主题-->
+    <style name="dialog_soft_input" parent="dialog_transparent">
+        <item name="android:windowSoftInputMode">stateVisible|adjustPan</item>
+    </style>
+
+    <!--弹窗上的按钮样式-->
+    <style name="button_dialog">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_marginLeft">@dimen/size_10dp</item>
+        <item name="android:layout_marginRight">@dimen/size_10dp</item>
+        <item name="android:background">@drawable/rounded_corner_radius_999dp</item>
+        <item name="backgroundTint">@color/lightGrey</item>
+        <item name="android:textColor">@color/theme</item>
+        <item name="android:textSize">@dimen/size_13sp</item>
+    </style>
+
+    <!--弹窗上标题样式-->
+    <style name="title_dialog">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:paddingTop">@dimen/size_10dp</item>
+        <item name="android:paddingBottom">@dimen/size_10dp</item>
+        <item name="android:textColor">#000000</item>
+        <item name="android:textSize">@dimen/size_15sp</item>
+    </style>
+
+    <!--弹窗根布局样式-->
+    <style name="bg_dialog">
+        <item name="android:layout_margin">@dimen/size_10dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/rounded_corner_radius_10dp</item>
+        <item name="android:textColor">@color/theme</item>
+    </style>
+</resources>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".activity.MainActivity"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="state"
+            type="int" />
+
+        <import type="com.naruto.recorder.utils.DataBindingUtils" />
+
+        <import type="com.naruto.recorder.service.RecordService" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/paddingHorizontal">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:tag="@string/title_bar_tag"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:onClick="about"
+                android:id="@+id/iv_help"
+                android:layout_width="@dimen/size_30dp"
+                android:layout_height="@dimen/size_30dp"
+                android:layout_gravity="right"
+                android:src="@drawable/ic_help" />
+        </FrameLayout>
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/size_90dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="@dimen/size_11dp">
+
+            <ImageView
+                setSelected="@{state==RecordService.STATE_RECORDING}"
+                android:layout_width="@dimen/size_70dp"
+                android:layout_height="@dimen/size_70dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/ring_thickness_ratio_27"
+                android:onClick="pauseOrResume"
+                android:padding="@dimen/size_20dp"
+                android:src="@drawable/selector_play_pause"
+                app:tint="@color/control" />
+
+            <ImageView
+                android:layout_width="@dimen/size_50dp"
+                android:layout_height="@dimen/size_50dp"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ring_thickness_ratio_27"
+                android:padding="@dimen/size_10dp"
+                android:onClick="showFileList"
+                android:src="@drawable/ic_list"
+                android:visibility="@{DataBindingUtils.isVisible(state==RecordService.STATE_READY),default=visible}" />
+
+            <ImageView
+                android:layout_width="@dimen/size_50dp"
+                android:layout_height="@dimen/size_50dp"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ring_thickness_ratio_27"
+                android:onClick="complete"
+                android:padding="@dimen/size_10dp"
+                android:src="@drawable/ic_stop"
+                android:visibility="@{DataBindingUtils.isVisible(state!=RecordService.STATE_READY),default=gone}"
+                tools:visibility="gone" />
+
+            <ImageView
+                android:layout_width="@dimen/size_50dp"
+                android:layout_height="@dimen/size_50dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ring_thickness_ratio_27"
+                android:padding="@dimen/size_10dp"
+                android:onClick="setting"
+                android:src="@drawable/ic_more" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/iv_state"
+            setSelected="@{state!=RecordService.STATE_READY}"
+            android:layout_width="@dimen/size_210dp"
+            android:layout_height="@dimen/size_210dp"
+            android:background="@drawable/ring_thickness_ratio_10"
+            android:foreground="@drawable/ring_state"
+            android:padding="@dimen/size_60dp"
+            android:src="@drawable/ic_mic"
+            app:layout_constraintBottom_toTopOf="@+id/tv_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:tint="@color/selected_grey_red" />
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/size_10dp"
+            android:text="00:00:00"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_state"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_state" />
+
+        <TextView
+            android:id="@+id/tv_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text='@{state==RecordService.STATE_READY?"录音准备中":(state==RecordService.STATE_RECORDING?"正在录音":"录音已暂停")}'
+            android:textSize="15sp"
+            app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_time"
+            tools:text="录音已暂停" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

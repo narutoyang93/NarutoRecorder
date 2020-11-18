@@ -1,0 +1,82 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdkVersion 29
+
+    defaultConfig {
+        applicationId "com.naruto.narutorecorder"
+        minSdkVersion 22
+        targetSdkVersion 29
+        versionCode VERSION_CODE as int
+        versionName VERSION_NAME
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    //签名
+    signingConfigs {
+        config {
+            storeFile file(KEY_PATH)
+            storePassword KEY_PW
+            keyAlias KEY_ALIAS
+            keyPassword ALIAS_PW
+        }
+    }
+
+
+    buildTypes {
+        debug {
+            minifyEnabled false//代码混淆
+            shrinkResources false//资源压缩
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "boolean", "LOG_DEBUG", "true"
+            buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
+            signingConfig signingConfigs.config
+
+            // xml布局文件调用
+            resValue "string", "version_name", "${VERSION_NAME}"
+            resValue "string", "version_code", "${VERSION_CODE}"
+        }
+        release {
+            minifyEnabled true//代码混淆
+            shrinkResources true//资源压缩
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+            buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
+            signingConfig signingConfigs.config
+
+            // xml布局文件调用
+            resValue "string", "version_name", "${VERSION_NAME}"
+            resValue "string", "version_code", "${VERSION_CODE}"
+        }
+    }
+
+    dataBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    testImplementation 'junit:junit:4.13.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+}

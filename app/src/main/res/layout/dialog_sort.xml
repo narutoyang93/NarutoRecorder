@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <!--已经选中标题-->
+        <variable
+            name="hasSelectedTime"
+            type="Boolean" />
+    </data>
+
+    <LinearLayout
+        style="@style/bg_dialog"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/title_dialog"
+            android:text="排序" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/size_1dp"
+            android:background="@color/colorLine" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/size_80dp"
+            android:divider="@drawable/line_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/size_10dp"
+            android:showDividers="middle">
+
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableRight="@drawable/radio_button"
+                android:gravity="center_vertical"
+                android:text="标题" />
+
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:button="@null"
+                android:checked="@={hasSelectedTime,default=false}"
+                android:drawableRight="@drawable/radio_button"
+                android:gravity="center_vertical"
+                android:text="时间" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/size_60dp"
+            android:gravity="center_vertical">
+
+            <Button
+                android:id="@+id/btn_descending"
+                style="@style/button_dialog"
+                android:layout_width="0dp"
+                android:layout_marginRight="0dp"
+                android:layout_weight="1"
+                android:text="降序" />
+
+            <Button
+                android:id="@+id/btn_ascending"
+                style="@style/button_dialog"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="升序" />
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

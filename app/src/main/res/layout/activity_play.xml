@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="duration"
+            type="String" />
+
+        <variable
+            name="isPlaying"
+            type="Boolean" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".activity.PlayActivity">
+
+        <FrameLayout
+            android:id="@+id/fl_titleBar"
+            style="@style/title_bar_style"
+            android:background="@drawable/bg_bottom_line"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <include layout="@layout/title_bar_merge" />
+
+            <ImageView
+                style="@style/back_btn_style"
+                android:layout_gravity="right"
+                android:onClick="share"
+                android:src="@drawable/ic_share" />
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/iv_state"
+            setSelected="@{isPlaying,default=true}"
+            android:layout_width="@dimen/size_210dp"
+            android:layout_height="@dimen/size_210dp"
+            android:layout_marginTop="@dimen/size_20dp"
+            android:background="@drawable/ring_thickness_ratio_10"
+            android:foreground="@drawable/ring_state"
+            android:src="@drawable/ic_launcher_foreground"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fl_titleBar"
+            app:tint="@color/selected_grey_red" />
+
+        <ImageView
+            android:id="@+id/iv_play"
+            setSelected="@{isPlaying,default=true}"
+            android:layout_width="@dimen/size_60dp"
+            android:layout_height="@dimen/size_60dp"
+            android:layout_marginBottom="@dimen/size_10dp"
+            android:background="@drawable/ring_thickness_ratio_27"
+            android:onClick="playOrPause"
+            android:padding="@dimen/size_15dp"
+            android:src="@drawable/play_pause"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/size_10dp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_time"
+            app:layout_constraintTop_toBottomOf="@id/iv_state"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00:00"
+            android:textSize="@dimen/size_9sp"
+            app:layout_constraintBottom_toTopOf="@id/iv_play"
+            app:layout_constraintLeft_toLeftOf="@id/seekBar"
+            app:layout_constraintTop_toBottomOf="@+id/seekBar" />
+
+        <TextView
+            android:id="@+id/tv_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{duration}"
+            android:textSize="@dimen/size_9sp"
+            app:layout_constraintBaseline_toBaselineOf="@id/tv_time"
+            app:layout_constraintRight_toRightOf="@id/seekBar"
+            tools:text="00:00:00" />
+
+        <CheckBox
+            android:id="@+id/cb_repeat"
+            android:layout_width="@dimen/size_30dp"
+            android:layout_height="@dimen/size_30dp"
+            android:layout_marginLeft="@dimen/paddingHorizontal"
+            android:background="@drawable/ic_repeat_one"
+            android:backgroundTint="@color/selected_grey_red"
+            android:button="@null"
+            app:layout_constraintBottom_toBottomOf="@id/iv_play"
+            app:layout_constraintLeft_toLeftOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

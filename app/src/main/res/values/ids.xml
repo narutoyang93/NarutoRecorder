@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="iv_titleBar_back" type="id"/>
+    <item name="fl_titleBar" type="id" />
+</resources>

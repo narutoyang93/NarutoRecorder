@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="paddingHorizontal">@dimen/size_20dp</dimen>
+    <dimen name="titleBarHeight">@dimen/size_48dp</dimen>
+
+    <dimen name="size_10dp">10dp</dimen>
+    <dimen name="size_48dp">48dp</dimen>
+
+    <dimen name="size_200dp">200dp</dimen>
+    <dimen name="size_50dp">50dp</dimen>
+    <dimen name="size_80dp">80dp</dimen>
+    <dimen name="size_100dp">100dp</dimen>
+    <dimen name="size_180dp">180dp</dimen>
+    <dimen name="size_30dp">30dp</dimen>
+    <dimen name="size_1dp">1dp</dimen>
+    <dimen name="size_2dp">2dp</dimen>
+    <dimen name="size_3dp">3dp</dimen>
+    <dimen name="size_4dp">4dp</dimen>
+    <dimen name="size_5dp">5dp</dimen>
+
+    <dimen name="size_90dp">90dp</dimen>
+    <dimen name="size_11dp">11dp</dimen>
+    <dimen name="size_70dp">70dp</dimen>
+    <dimen name="size_20dp">20dp</dimen>
+    <dimen name="size_210dp">210dp</dimen>
+    <dimen name="size_60dp">60dp</dimen>
+
+    <dimen name="size_15dp">15dp</dimen>
+    <dimen name="size_12dp">12dp</dimen>
+
+
+
+<!--    sp      -->
+    <dimen name="size_9sp">9sp</dimen>
+    <dimen name="size_10sp">10sp</dimen>
+    <dimen name="size_11sp">11sp</dimen>
+    <dimen name="size_12sp">12sp</dimen>
+    <dimen name="size_13sp">13sp</dimen>
+    <dimen name="size_14sp">14sp</dimen>
+    <dimen name="size_15sp">15sp</dimen>
+    <dimen name="size_16sp">16sp</dimen>
+    <dimen name="size_17sp">17sp</dimen>
+    <dimen name="size_18sp">18sp</dimen>
+    <dimen name="size_19sp">19sp</dimen>
+    <dimen name="size_20sp">20sp</dimen>
+
+    <dimen name="size_0_5dp">0.5dp</dimen>
+
+    <dimen name="size_160dp">160dp</dimen>
+
+
+    <dimen name="size_999dp">999dp</dimen>
+
+    <dimen name="size_40dp">40dp</dimen>
+    <dimen name="size_7dp">7dp</dimen>
+    <dimen name="size_275dp">275dp</dimen>
+    <dimen name="size_37dp">37dp</dimen>
+    <dimen name="size_8dp">8dp</dimen>
+</resources>

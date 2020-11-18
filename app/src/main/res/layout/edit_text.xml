@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="value"
+            type="String" />
+    </data>
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/size_10dp"
+        android:layout_marginTop="@dimen/size_10dp"
+        android:autofillHints=""
+        android:paddingVertical="@dimen/size_10dp"
+        android:background="@drawable/rounded_corner_radius_999dp"
+        android:backgroundTint="@color/lightGrey"
+        android:gravity="center_vertical"
+        android:hint="输入文本"
+        android:inputType="text"
+        android:lines="1"
+        android:maxLength="50"
+        android:paddingHorizontal="@dimen/size_15dp"
+        android:selectAllOnFocus="true"
+        android:text="@={value}"
+        android:textColor="#000000">
+
+    </EditText>
+</layout>

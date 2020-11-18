@@ -20,6 +20,7 @@ import com.naruto.recorder.databinding.ActivityMainBinding;
 import com.naruto.recorder.databinding.DialogSaveBinding;
 import com.naruto.recorder.service.RecordService;
 import com.naruto.recorder.utils.DialogFactory;
+import com.naruto.recorder.utils.MyTool;
 
 /**
  * @Purpose
@@ -174,6 +175,12 @@ public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
     private void showSaveDialog(String fileName) {
         if (saveDialog == null) createSaveDialog();
         saveBinding.setValue(fileName);
+        saveBinding.include.editText.post(new Runnable() {
+            @Override
+            public void run() {
+                saveBinding.include.editText.selectAll();
+            }
+        });
         saveDialog.show();
     }
 
@@ -188,11 +195,8 @@ public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
             @Override
             public void onClick(View view) {
                 String v = saveBinding.getValue().trim();
-                if (v.length() == 0) {
-                    toast("未输入文件名");
-                } else {
+                if (MyTool.checkNewFileName(MainActivity.this, v)) {
                     binder.save(v);
-                    unbindService(connection);
                     saveDialog.dismiss();
                 }
             }

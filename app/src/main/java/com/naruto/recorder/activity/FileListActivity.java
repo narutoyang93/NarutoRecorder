@@ -164,6 +164,12 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
             renameBinding.setValue(waitingRenameItem.name);
             break;
         }
+        renameBinding.include.editText.post(new Runnable() {
+            @Override
+            public void run() {
+                renameBinding.include.editText.selectAll();
+            }
+        });
         renameDialog.show();
     }
 
@@ -198,29 +204,30 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
             @Override
             public void onClick(View view) {
                 String v = renameBinding.getValue().trim();
-                if (v.length() == 0) {
-                    toast("未输入文件名");
-                } else {
-                    File file;
-                    try {
-                        file = new File(waitingRenameItem.path);
-                        if (file.exists()) {
-                            // TODO: 2020/11/16 0016 处理曾修改保存路径的情况
-                            file.renameTo(new File(RecordService.getNewFilePath(v)));
-                            waitingRenameItem.name = v;
-                            waitingRenameItem.path = file.getAbsolutePath();
-                            adapter.notifyItemChanged(adapter.getDataList().indexOf(waitingRenameItem), "name");
-                        } else {
-                            toast("文件不存在");
-                            adapter.deleteFiles();
-                        }
-
-                    } catch (Exception e) {
-                        toast("操作异常");
-                        e.printStackTrace();
-                    }
+                if (v.equals(waitingRenameItem.name)) {//文件名没有改变，不需要执行操作
                     renameDialog.dismiss();
+                    return;
                 }
+                if (!MyTool.checkNewFileName(FileListActivity.this, v)) return;
+                File file;
+                try {
+                    file = new File(waitingRenameItem.path);
+                    if (file.exists()) {
+                        // TODO: 2020/11/16 0016 处理曾修改保存路径的情况
+                        file.renameTo(new File(RecordService.getNewFilePath(v)));
+                        waitingRenameItem.name = v;
+                        waitingRenameItem.path = file.getAbsolutePath();
+                        adapter.notifyItemChanged(adapter.getDataList().indexOf(waitingRenameItem), "name");
+                    } else {
+                        toast("文件不存在");
+                        adapter.deleteFiles();
+                    }
+
+                } catch (Exception e) {
+                    toast("操作异常");
+                    e.printStackTrace();
+                }
+                renameDialog.dismiss();
             }
         });
     }

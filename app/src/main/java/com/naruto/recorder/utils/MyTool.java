@@ -32,6 +32,7 @@ import androidx.core.content.FileProvider;
 
 import com.naruto.recorder.BuildConfig;
 import com.naruto.recorder.InterfaceFactory;
+import com.naruto.recorder.MyApplication;
 import com.naruto.recorder.R;
 
 import java.io.File;
@@ -246,11 +247,33 @@ public class MyTool {
 
     /**
      * 获取编译时间
+     *
      * @param format 日期格式
      * @return
      */
-    public static String getBuildTime(String format){
+    public static String getBuildTime(String format) {
         return new SimpleDateFormat(format).format(new Date(BuildConfig.TIMESTAMP));
+    }
+
+    /**
+     * 重命名文件时检查文件名
+     *
+     * @param context
+     * @param fileName
+     * @return
+     */
+    public static boolean checkNewFileName(Context context, String fileName) {
+        if (fileName.length() == 0) {
+            Toast.makeText(context, "未输入文件名", Toast.LENGTH_SHORT).show();
+        }
+        String s = "/\\:*?\"<>|";
+        for (int i = 0; i < s.length(); i++) {
+            if (fileName.indexOf(s.charAt(i)) != -1) {
+                Toast.makeText(context, String.format("文件名不能包含%s等符号", s), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        return true;
     }
 
 

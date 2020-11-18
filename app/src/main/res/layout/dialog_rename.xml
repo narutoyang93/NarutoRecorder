@@ -26,7 +26,7 @@
             android:background="@color/colorLine" />
 
         <include
-            android:id="@+id/include2"
+            android:id="@+id/include"
             layout="@layout/edit_text"
             app:value="@={value}" />
 

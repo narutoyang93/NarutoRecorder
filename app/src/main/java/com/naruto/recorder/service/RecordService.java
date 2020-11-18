@@ -167,9 +167,10 @@ public class RecordService extends Service {
         }
 
         private void reset() {
-            updateState(state = STATE_READY);
+            IUpdateUI.updateState(state = STATE_READY);
             calculagraph.reset();
             lastSecondValue = -1;
+            stopSelf();
         }
 
         /**

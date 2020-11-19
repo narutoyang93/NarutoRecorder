@@ -1,6 +1,6 @@
 1.Activity销毁后让Service继续执行
 2.从通知唤醒App
-3.软键盘遮挡Dialog
+
 4.分享快牙
 5.设置
 6.播放列表

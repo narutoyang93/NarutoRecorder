@@ -7,13 +7,12 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
-import android.text.BoringLayout;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import com.naruto.recorder.activity.MainActivity;
 import com.naruto.recorder.R;
+import com.naruto.recorder.activity.PlayActivity;
 import com.naruto.recorder.utils.MyTool;
 
 import java.io.File;
@@ -62,7 +61,7 @@ public class PlayService extends Service {
     public void onCreate() {
         super.onCreate();
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationBuilder = MyTool.setForegroundService(this, MainActivity.class, R.mipmap.ic_launcher, NOTIFICATION_ID);
+        notificationBuilder = MyTool.setForegroundService(this, PlayActivity.class, R.mipmap.ic_launcher, NOTIFICATION_ID);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.naruto.recorder.activity;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Handler;
 import android.util.Pair;
@@ -10,7 +11,6 @@ import android.view.ViewGroup;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.naruto.recorder.R;
 import com.naruto.recorder.SharedPreferencesHelper;
 import com.naruto.recorder.adapter.FileListAdapter;
@@ -35,8 +35,8 @@ import java.util.List;
 public class FileListActivity extends DataBindingActivity<ActivityFileListBinding> {
     private FileListAdapter adapter;
     private FileListAdapter.FileInfo waitingRenameItem;//等待重命名的文件
-    private BottomSheetDialog renameDialog;//重命名弹窗
-    private BottomSheetDialog sortDialog;//排序弹窗
+    private Dialog renameDialog;//重命名弹窗
+    private Dialog sortDialog;//排序弹窗
     DialogRenameBinding renameBinding;
     DialogSortBinding sortBinding;
 
@@ -189,10 +189,10 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
      */
     private void createRenameDialog() {
         //创建弹窗
-        renameDialog = new BottomSheetDialog(this, R.style.dialog_soft_input);
-        renameDialog.setCancelable(true);
         renameBinding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.dialog_rename, (ViewGroup) rootView, false);
-        renameDialog.setContentView(renameBinding.getRoot());
+        renameDialog = MyTool.createBottomInputDialog(this, renameBinding.getRoot());
+        renameDialog.setCancelable(true);
+
         //设置点击事件
         renameBinding.btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -238,10 +238,10 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
      */
     private void createSortDialog() {
         //创建弹窗
-        sortDialog = new BottomSheetDialog(this, R.style.dialog_transparent);
-        sortDialog.setCancelable(true);
         sortBinding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.dialog_sort, (ViewGroup) rootView, false);
-        sortDialog.setContentView(sortBinding.getRoot());
+        sortDialog = MyTool.createBottomDialog(this, 0, sortBinding.getRoot());
+        sortDialog.setCancelable(true);
+
         Pair<String, Boolean> sortType = SharedPreferencesHelper.getSortType();
         sortBinding.setHasSelectedTime(sortType.first.equals("time"));
         //设置点击事件

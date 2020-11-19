@@ -107,7 +107,6 @@
 
     <!--弹窗根布局样式-->
     <style name="bg_dialog">
-        <item name="android:layout_margin">@dimen/size_10dp</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/rounded_corner_radius_10dp</item>

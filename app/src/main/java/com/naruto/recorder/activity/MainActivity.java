@@ -1,6 +1,7 @@
 package com.naruto.recorder.activity;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -34,7 +35,7 @@ public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
     private int state = 0;//状态
     private RecordService.RecordBinder binder;
     private ServiceConnection connection;
-    private BottomSheetDialog saveDialog;//保存弹窗
+    private Dialog saveDialog;//保存弹窗
     private DialogSaveBinding saveBinding;
     private boolean isNeedResumeWhenBack = false;//保存弹窗返回是否需要继续录音（当按下“完成”按钮时正在录音，则返回后需要继续录音）
 
@@ -186,10 +187,10 @@ public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
 
     private void createSaveDialog() {
         //创建弹窗
-        saveDialog = new BottomSheetDialog(this, R.style.dialog_soft_input);
-        saveDialog.setCancelable(true);
         saveBinding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.dialog_save, (ViewGroup) rootView, false);
-        saveDialog.setContentView(saveBinding.getRoot());
+        saveDialog = MyTool.createBottomInputDialog(this, saveBinding.getRoot());
+        saveDialog.setCancelable(true);
+
         //设置点击事件
         saveBinding.btnSave.setOnClickListener(new View.OnClickListener() {
             @Override

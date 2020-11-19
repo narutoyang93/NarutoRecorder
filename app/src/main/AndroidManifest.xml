@@ -15,7 +15,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NarutoRecorder">
-        <activity android:name=".activity.PlayActivity"></activity>
+        <activity
+            android:name=".activity.PlayActivity"
+            android:launchMode="singleTask"></activity>
         <activity android:name=".activity.SettingActivity" />
         <activity
             android:name=".activity.FileListActivity"

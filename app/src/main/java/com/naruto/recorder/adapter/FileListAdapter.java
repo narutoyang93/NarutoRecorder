@@ -2,6 +2,7 @@ package com.naruto.recorder.adapter;
 
 import android.media.MediaPlayer;
 import android.util.Pair;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,6 +101,10 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.VH> {
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file, parent, false);
         VH vh = new VH(view);
+        TypedValue typedValue = new TypedValue();
+        parent.getContext().getTheme().resolveAttribute(R.attr.selectableItemBackground, typedValue, true);
+        view.setBackgroundResource(typedValue.resourceId);
+
         if (listener != null) {
             //整个item点击
             vh.itemView.setOnClickListener(new View.OnClickListener() {

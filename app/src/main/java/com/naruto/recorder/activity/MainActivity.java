@@ -185,6 +185,10 @@ public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
         saveDialog.show();
     }
 
+
+    /**
+     * 创建保存弹窗
+     */
     private void createSaveDialog() {
         //创建弹窗
         saveBinding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.dialog_save, (ViewGroup) rootView, false);
@@ -198,6 +202,7 @@ public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
                 String v = saveBinding.getValue().trim();
                 if (MyTool.checkNewFileName(MainActivity.this, v)) {
                     binder.save(v);
+                    unbindService(connection);
                     saveDialog.dismiss();
                 }
             }

@@ -17,8 +17,10 @@
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:lines">1</item>
-        <item name="android:ellipsize">end</item>
+        <item name="android:paddingLeft">@dimen/size_30dp</item>
+        <item name="android:paddingRight">@dimen/size_30dp</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:singleLine">true</item>
         <item name="android:textSize">@dimen/size_17sp</item>
         <item name="android:textColor">#636363</item>
     </style>
@@ -112,4 +114,5 @@
         <item name="android:background">@drawable/rounded_corner_radius_10dp</item>
         <item name="android:textColor">@color/theme</item>
     </style>
+
 </resources>

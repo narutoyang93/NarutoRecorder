@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
@@ -103,7 +104,10 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     protected void setTitleBarTitle(String title, View.OnClickListener backBtnClickListener) {
         TextView tvTitleBarTitle = findViewById(R.id.tv_titleBar_title);
-        if (tvTitleBarTitle != null) tvTitleBarTitle.setText(title);
+        if (tvTitleBarTitle != null) {
+            tvTitleBarTitle.setText(title);
+            tvTitleBarTitle.setSelected(true);//marquee效果需要
+        }
         View backBtn = findViewById(R.id.iv_titleBar_back);
         if (backBtn != null) backBtn.setOnClickListener(backBtnClickListener);
     }

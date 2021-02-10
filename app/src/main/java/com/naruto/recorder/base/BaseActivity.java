@@ -1,29 +1,28 @@
 package com.naruto.recorder.base;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import com.naruto.recorder.R;
+import com.naruto.recorder.utils.DialogFactory;
 import com.naruto.recorder.utils.statusbar.StatusBarUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 /**
  * @Purpose
@@ -32,7 +31,7 @@ import java.util.List;
  * @Note
  */
 public abstract class BaseActivity extends AppCompatActivity {
-    public ProgressDialog progressDialog;//加载弹窗
+    public AlertDialog loadingDialog;//加载弹窗
     protected View rootView;//根布局，即getLayoutRes()返回的布局
     protected View titleBar;//标题栏
     protected Toast toast;
@@ -179,38 +178,21 @@ public abstract class BaseActivity extends AppCompatActivity {
     /**
      * 展示等待对话框
      */
-    public void showProgressDialog() {
-        Log.d("BaseActivity", "--->showProgressDialog: ");
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(BaseActivity.this);
-            progressDialog.setMessage("正在加载...");
-        }
-        if (!progressDialog.isShowing()) {
-            progressDialog.show();
+    public void showLoadingDialog() {
+        if (loadingDialog == null) {
+            loadingDialog = DialogFactory.showLoadingDialog(this);
+        } else if (!loadingDialog.isShowing()) {
+            loadingDialog.show();
         }
     }
 
-    /**
-     * 展示等待对话框
-     */
-    public void showProgressDialog(String msg) {
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(BaseActivity.this);
-            progressDialog.setMessage(msg);
-        }
-        if (!progressDialog.isShowing()) {
-            progressDialog.show();
-        }
-    }
 
     /**
      * 隐藏等待对话框
      */
-    public void dismissProgressDialog() {
-        Log.d("BaseActivity", "--->dismissProgressDialog: 0");
-        if (progressDialog != null && progressDialog.isShowing()) {
-            Log.d("BaseActivity", "--->dismissProgressDialog: 2");
-            progressDialog.dismiss();
+    public void dismissLoadingDialog() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
         }
     }
 

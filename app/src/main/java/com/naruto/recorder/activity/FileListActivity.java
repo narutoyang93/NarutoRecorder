@@ -74,7 +74,7 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
                     public void run() {
                         adapter.notifyDataSetChanged();
                         dataBinding.setTotalCount(adapter.getItemCount());
-                        dismissProgressDialog();
+                        dismissLoadingDialog();
                     }
                 });
             }
@@ -85,7 +85,7 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
                     @Override
                     public void run() {//获取文件时没有数据
                         dataBinding.setTotalCount(0);
-                        dismissProgressDialog();
+                        dismissLoadingDialog();
                     }
                 });
             }
@@ -114,7 +114,7 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
                 }
             }
         });
-        showProgressDialog();
+        showLoadingDialog();
         recyclerView.setAdapter(adapter);
     }
 
@@ -252,11 +252,11 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
                 Pair<String, Boolean> pair = SharedPreferencesHelper.getSortType();
                 if (sortBinding.getHasSelectedTime()) {
                     if (pair.first.equals("time") && !pair.second) return;
-                    showProgressDialog();
+                    showLoadingDialog();
                     adapter.sortByCreateTime(false);
                 } else {
                     if (pair.first.equals("title") && !pair.second) return;
-                    showProgressDialog();
+                    showLoadingDialog();
                     adapter.sortByName(false);
                 }
             }
@@ -268,11 +268,11 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
                 Pair<String, Boolean> pair = SharedPreferencesHelper.getSortType();
                 if (sortBinding.getHasSelectedTime()) {
                     if (pair.first.equals("time") && pair.second) return;
-                    showProgressDialog();
+                    showLoadingDialog();
                     adapter.sortByCreateTime(true);
                 } else {
                     if (pair.first.equals("title") && pair.second) return;
-                    showProgressDialog();
+                    showLoadingDialog();
                     adapter.sortByName(true);
                 }
             }

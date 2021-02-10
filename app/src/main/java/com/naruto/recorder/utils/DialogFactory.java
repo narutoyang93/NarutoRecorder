@@ -6,14 +6,12 @@ import android.text.TextUtils;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import com.naruto.recorder.R;
 
 import androidx.annotation.LayoutRes;
 import androidx.appcompat.app.AlertDialog;
-
-import com.naruto.recorder.R;
 
 
 /**
@@ -52,6 +50,22 @@ public class DialogFactory {
     }
 
 
+    /***
+     * 加载弹窗
+     * @param activity
+     * @return
+     */
+    public static AlertDialog showLoadingDialog(Activity activity) {
+        DialogData dialogData = new DialogData();
+        dialogData.layoutResId = R.layout.dialog_loading;
+        dialogData.themeResId = 0;
+        AlertDialog dialog = makeSimpleDialog(activity, dialogData).first;
+        dialog.setCancelable(false);
+        dialog.show();
+        return dialog;
+    }
+
+
     /**
      * 创建简单弹窗
      *
@@ -60,7 +74,7 @@ public class DialogFactory {
      * @return
      */
     public static Pair<AlertDialog, View> makeSimpleDialog(Context context, DialogData dialogData) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.DefaultDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, dialogData.themeResId);
         View view = LayoutInflater.from(context).inflate(dialogData.layoutResId, null);
         final AlertDialog dialog = builder.setView(view).create();
         //设置文本
@@ -171,6 +185,7 @@ public class DialogFactory {
      * @Note
      */
     public static class DialogData {
+        public int themeResId = R.style.DefaultDialogStyle;
         public int layoutResId = R.layout.dialog_simple_2_button;//布局id
         public String title;//标题
         public String content;//内容

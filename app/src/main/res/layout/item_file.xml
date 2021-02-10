@@ -22,17 +22,17 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/size_60dp"
+        android:layout_height="@dimen/dp_60"
         android:paddingHorizontal="@dimen/paddingHorizontal">
 
         <ImageView
             android:id="@+id/cb_play"
-            android:layout_width="@dimen/size_20dp"
-            android:layout_height="@dimen/size_20dp"
+            android:layout_width="@dimen/dp_20"
+            android:layout_height="@dimen/dp_20"
             android:src="@drawable/play_pause"
             android:button="@null"
             android:backgroundTint="@color/control"
-            android:padding="@dimen/size_4dp"
+            android:padding="@dimen/dp_4"
             android:background="@drawable/ring_thickness_ratio_10"
             android:visibility="@{DataBindingUtils.isVisible(!selectable),default=visible}"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -42,8 +42,8 @@
         <ImageView
             android:id="@+id/checkbox"
             setSelected="@{selected,default=false}"
-            android:layout_width="@dimen/size_20dp"
-            android:layout_height="@dimen/size_20dp"
+            android:layout_width="@dimen/dp_20"
+            android:layout_height="@dimen/dp_20"
             android:src="@drawable/check_box"
             android:visibility="@{DataBindingUtils.isVisible(selectable),default=gone}"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -80,7 +80,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/size_15dp"
+            android:layout_marginLeft="@dimen/dp_15"
             android:text="@{info.duration}"
             app:layout_constraintBaseline_toBaselineOf="@id/tv_time"
             app:layout_constraintLeft_toRightOf="@id/tv_time"
@@ -88,7 +88,7 @@
 
         <View
             android:layout_width="0dp"
-            android:layout_height="@dimen/size_0_5dp"
+            android:layout_height="@dimen/dp_0_5"
             android:background="@color/gray"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="@id/tv_name"

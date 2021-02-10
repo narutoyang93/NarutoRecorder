@@ -22,7 +22,7 @@
         <item name="android:paddingRight">@dimen/size_35dp</item>
         <item name="android:ellipsize">marquee</item>
         <item name="android:singleLine">true</item>
-        <item name="android:textSize">@dimen/size_17sp</item>
+        <item name="android:textSize">@dimen/sp_17</item>
         <item name="android:textColor">#636363</item>
     </style>
 
@@ -43,7 +43,7 @@
         <item name="android:id">@id/iv_titleBar_back</item>
         <item name="android:layout_width">@dimen/titleBarHeight</item>
         <item name="android:layout_height">@dimen/titleBarHeight</item>
-        <item name="android:padding">@dimen/size_12dp</item>
+        <item name="android:padding">@dimen/dp_12</item>
         <item name="android:src">@drawable/ic_back</item>
         <item name="android:tint">#5D5D5D</item>
     </style>
@@ -51,7 +51,7 @@
     <!--文件列表页面按钮样式-->
     <style name="file_list_button">
         <item name="android:gravity">center_horizontal</item>
-        <item name="android:textSize">@dimen/size_10sp</item>
+        <item name="android:textSize">@dimen/sp_10</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/enable_red_gray</item>
@@ -89,12 +89,12 @@
     <style name="button_dialog">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">40dp</item>
-        <item name="android:layout_marginLeft">@dimen/size_10dp</item>
-        <item name="android:layout_marginRight">@dimen/size_10dp</item>
+        <item name="android:layout_marginLeft">@dimen/dp_10</item>
+        <item name="android:layout_marginRight">@dimen/dp_10</item>
         <item name="android:background">@drawable/rounded_corner_radius_999dp</item>
         <item name="backgroundTint">@color/lightGrey</item>
         <item name="android:textColor">@color/theme</item>
-        <item name="android:textSize">@dimen/size_13sp</item>
+        <item name="android:textSize">@dimen/sp_13</item>
     </style>
 
     <!--弹窗上标题样式-->
@@ -102,10 +102,10 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center_horizontal</item>
-        <item name="android:paddingTop">@dimen/size_10dp</item>
-        <item name="android:paddingBottom">@dimen/size_10dp</item>
+        <item name="android:paddingTop">@dimen/dp_10</item>
+        <item name="android:paddingBottom">@dimen/dp_10</item>
         <item name="android:textColor">#000000</item>
-        <item name="android:textSize">@dimen/size_15sp</item>
+        <item name="android:textSize">@dimen/sp_15</item>
     </style>
 
     <!--弹窗根布局样式-->

@@ -29,8 +29,8 @@
             <ImageView
                 android:onClick="about"
                 android:id="@+id/iv_help"
-                android:layout_width="@dimen/size_30dp"
-                android:layout_height="@dimen/size_30dp"
+                android:layout_width="@dimen/dp_30"
+                android:layout_height="@dimen/dp_30"
                 android:layout_gravity="right"
                 android:src="@drawable/ic_help" />
         </FrameLayout>
@@ -38,49 +38,49 @@
         <RelativeLayout
             android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/size_90dp"
+            android:layout_height="@dimen/dp_90"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:layout_editor_absoluteX="@dimen/size_11dp">
 
             <ImageView
                 setSelected="@{state==RecordService.STATE_RECORDING}"
-                android:layout_width="@dimen/size_70dp"
-                android:layout_height="@dimen/size_70dp"
+                android:layout_width="@dimen/dp_70"
+                android:layout_height="@dimen/dp_70"
                 android:layout_centerInParent="true"
                 android:background="@drawable/ring_thickness_ratio_27"
                 android:onClick="pauseOrResume"
-                android:padding="@dimen/size_20dp"
+                android:padding="@dimen/dp_20"
                 android:src="@drawable/selector_play_pause"
                 app:tint="@color/control" />
 
             <ImageView
-                android:layout_width="@dimen/size_50dp"
-                android:layout_height="@dimen/size_50dp"
+                android:layout_width="@dimen/dp_50"
+                android:layout_height="@dimen/dp_50"
                 android:layout_centerVertical="true"
                 android:background="@drawable/ring_thickness_ratio_27"
-                android:padding="@dimen/size_10dp"
+                android:padding="@dimen/dp_10"
                 android:onClick="showFileList"
                 android:src="@drawable/ic_list"
                 android:visibility="@{DataBindingUtils.isVisible(state==RecordService.STATE_READY),default=visible}" />
 
             <ImageView
-                android:layout_width="@dimen/size_50dp"
-                android:layout_height="@dimen/size_50dp"
+                android:layout_width="@dimen/dp_50"
+                android:layout_height="@dimen/dp_50"
                 android:layout_centerVertical="true"
                 android:background="@drawable/ring_thickness_ratio_27"
                 android:onClick="complete"
-                android:padding="@dimen/size_10dp"
+                android:padding="@dimen/dp_10"
                 android:src="@drawable/ic_stop"
                 android:visibility="@{DataBindingUtils.isVisible(state!=RecordService.STATE_READY),default=gone}"
                 tools:visibility="gone" />
 
             <ImageView
-                android:layout_width="@dimen/size_50dp"
-                android:layout_height="@dimen/size_50dp"
+                android:layout_width="@dimen/dp_50"
+                android:layout_height="@dimen/dp_50"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:background="@drawable/ring_thickness_ratio_27"
-                android:padding="@dimen/size_10dp"
+                android:padding="@dimen/dp_10"
                 android:onClick="setting"
                 android:src="@drawable/ic_more" />
         </RelativeLayout>
@@ -88,11 +88,11 @@
         <ImageView
             android:id="@+id/iv_state"
             setSelected="@{state!=RecordService.STATE_READY}"
-            android:layout_width="@dimen/size_210dp"
-            android:layout_height="@dimen/size_210dp"
+            android:layout_width="@dimen/dp_210"
+            android:layout_height="@dimen/dp_210"
             android:background="@drawable/ring_thickness_ratio_10"
             android:foreground="@drawable/ring_state"
-            android:padding="@dimen/size_60dp"
+            android:padding="@dimen/dp_60"
             android:src="@drawable/ic_mic"
             app:layout_constraintBottom_toTopOf="@+id/tv_time"
             app:layout_constraintEnd_toEndOf="parent"
@@ -106,7 +106,7 @@
             android:id="@+id/tv_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/size_10dp"
+            android:layout_marginVertical="@dimen/dp_10"
             android:text="00:00:00"
             android:textColor="#000000"
             android:textSize="20sp"

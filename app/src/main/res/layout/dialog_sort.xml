@@ -22,15 +22,15 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="@dimen/size_1dp"
+            android:layout_height="@dimen/dp_1"
             android:background="@color/colorLine" />
 
         <RadioGroup
             android:layout_width="match_parent"
-            android:layout_height="@dimen/size_80dp"
+            android:layout_height="@dimen/dp_80"
             android:divider="@drawable/line_horizontal"
             android:orientation="vertical"
-            android:paddingHorizontal="@dimen/size_10dp"
+            android:paddingHorizontal="@dimen/dp_10"
             android:showDividers="middle">
 
             <RadioButton
@@ -55,7 +55,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/size_60dp"
+            android:layout_height="@dimen/dp_60"
             android:gravity="center_vertical">
 
             <Button

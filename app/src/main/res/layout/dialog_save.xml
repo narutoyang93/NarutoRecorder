@@ -19,7 +19,7 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="@dimen/size_1dp"
+            android:layout_height="@dimen/dp_1"
             android:background="@color/colorLine" />
 
         <include
@@ -30,19 +30,19 @@
         <Button
             android:id="@+id/btn_save"
             style="@style/button_dialog"
-            android:layout_marginTop="@dimen/size_20dp"
+            android:layout_marginTop="@dimen/dp_20"
             android:text="保存" />
 
         <Button
             android:id="@+id/btn_back"
             style="@style/button_dialog"
-            android:layout_marginTop="@dimen/size_20dp"
+            android:layout_marginTop="@dimen/dp_20"
             android:text="返回" />
 
         <Button
             android:id="@+id/btn_delete"
             style="@style/button_dialog"
-            android:layout_marginVertical="@dimen/size_20dp"
+            android:layout_marginVertical="@dimen/dp_20"
             android:text="删除"
             android:textColor="@android:color/holo_red_light" />
     </LinearLayout>

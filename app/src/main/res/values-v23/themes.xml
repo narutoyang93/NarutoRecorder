@@ -4,7 +4,7 @@
     <style name="file_list_button">
         <item name="android:drawableTint">@color/enable_red_gray</item>
         <item name="android:gravity">center_horizontal</item>
-        <item name="android:textSize">@dimen/size_10sp</item>
+        <item name="android:textSize">@dimen/sp_10</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/enable_red_gray</item>

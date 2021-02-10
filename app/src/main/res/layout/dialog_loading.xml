@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingVertical="@dimen/size_20dp">
+    android:paddingVertical="@dimen/dp_20">
 
     <ProgressBar
         style="?android:progressBarStyleLarge"
@@ -15,8 +15,8 @@
         android:id="@+id/tv_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/size_10dp"
+        android:layout_marginTop="@dimen/dp_10"
         android:gravity="center_horizontal"
         android:text="正在加载..."
-        android:textSize="@dimen/size_15sp" />
+        android:textSize="@dimen/sp_15" />
 </LinearLayout>

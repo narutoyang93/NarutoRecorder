@@ -5,7 +5,7 @@
             <solid android:color="@color/colorLine" />
         </shape>
     </item>
-    <item android:top="@dimen/size_0_5dp">
+    <item android:top="@dimen/dp_0_5">
         <shape>
             <solid android:color="@color/white" />
         </shape>

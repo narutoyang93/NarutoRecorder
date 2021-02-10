@@ -18,7 +18,6 @@ import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.View;
@@ -38,7 +37,6 @@ import androidx.core.content.FileProvider;
 
 import com.naruto.recorder.BuildConfig;
 import com.naruto.recorder.InterfaceFactory;
-import com.naruto.recorder.MyApplication;
 import com.naruto.recorder.R;
 
 import java.io.File;
@@ -352,7 +350,7 @@ public class MyTool {
         dialog.setContentView(contentView);
         Window window = dialog.getWindow();
         window.setGravity(Gravity.BOTTOM);
-        window.getDecorView().setPadding(0, 0, 0, context.getResources().getDimensionPixelSize(R.dimen.size_10dp));
+        window.getDecorView().setPadding(0, 0, 0, context.getResources().getDimensionPixelSize(R.dimen.dp_10));
         return dialog;
     }
 

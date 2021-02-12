@@ -4,4 +4,5 @@
     <string name="title_bar_tag">title_bar</string>
     <string name="protocol">《服务条款》与《隐私声明》</string>
     <string name="dpi_tag">normal</string>
+    <string name="tag_allow_fast_click">allowFastClick</string>
 </resources>

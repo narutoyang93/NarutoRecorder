@@ -4,7 +4,7 @@
 
         <!-- Customize your theme here. -->
         <item name="colorAccent">@color/theme</item>
-        <item name="colorPrimary">@color/material_grey_100</item>
+<!--        <item name="colorPrimary">@color/material_grey_100</item>-->
     </style>
 
     <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar">

@@ -60,6 +60,7 @@
             android:onClick="playOrPause"
             android:padding="@dimen/dp_15"
             android:src="@drawable/play_pause"
+            android:tag="@string/tag_allow_fast_click"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"

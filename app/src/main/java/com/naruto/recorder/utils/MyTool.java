@@ -8,9 +8,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.text.InputFilter;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -170,7 +172,7 @@ public class MyTool {
     }
 
     /**
-     * 根据获取文件uri
+     * 根据文件获取文件uri
      *
      * @param context
      * @param file
@@ -184,6 +186,34 @@ public class MyTool {
         }
     }
 
+
+    /**
+     * 获取要分享的文件的uri（用这种方式返回的Uri才能被外部应用识别）
+     *
+     * @param context
+     * @param file
+     * @return
+     */
+    private static Uri getFileUriForShare(Context context, File file) {
+        String volumeName = "external";
+        String filePath = file.getAbsolutePath();
+        String[] projection = new String[]{MediaStore.Files.FileColumns._ID};
+        Uri uri = null;
+
+        Cursor cursor = context.getContentResolver().query(MediaStore.Files.getContentUri(volumeName), projection,
+                MediaStore.MediaColumns.DATA + "=? ", new String[]{filePath}, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID));
+                uri = MediaStore.Files.getContentUri(volumeName, id);
+            }
+            cursor.close();
+        }
+
+        return uri;
+    }
+
+
     /**
      * 分享文件
      *
@@ -194,9 +224,8 @@ public class MyTool {
         Intent intent = new Intent();
         //获取文件uri
         ArrayList<Uri> uris = new ArrayList<>();
-        Uri uri = null;
         for (File f : files) {
-            uris.add(MyTool.getFileUri(activity, f));
+            uris.add(getFileUriForShare(activity, f));
         }
 
         if (uris.size() == 1) {

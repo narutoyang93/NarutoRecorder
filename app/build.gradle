@@ -5,18 +5,31 @@ plugins {
 apply plugin: 'android-aspectjx'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
+
+    ext {
+        appName = 'Naruto录音机'
+        appNameEn = 'narutoRecorder'//用于创建文件夹等
+    }
 
     defaultConfig {
         applicationId "com.naruto.narutorecorder"
         minSdkVersion 22
-        targetSdkVersion 29
-        versionCode VERSION_CODE as int
-        versionName VERSION_NAME
+        targetSdkVersion 30
+        versionCode 100
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables.useSupportLibrary = true
+
+        buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
+        buildConfigField "String", "APP_NAME", "\"${appNameEn}\""
+
+        // xml布局文件调用
+        resValue "string", "version_name", "${defaultConfig.versionName}"
+        resValue "string", "version_code", "${defaultConfig.versionCode}"
+        resValue "string", "app_name", "${appName}"
     }
 
     //签名
@@ -36,24 +49,12 @@ android {
             shrinkResources false//资源压缩
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "LOG_DEBUG", "true"
-            buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
             signingConfig signingConfigs.config
-
-            // xml布局文件调用
-            resValue "string", "version_name", "${VERSION_NAME}"
-            resValue "string", "version_code", "${VERSION_CODE}"
         }
-        release {
-            minifyEnabled true//代码混淆
-            shrinkResources true//资源压缩
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "boolean", "LOG_DEBUG", "false"
-            buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
-            signingConfig signingConfigs.config
 
-            // xml布局文件调用
-            resValue "string", "version_name", "${VERSION_NAME}"
-            resValue "string", "version_code", "${VERSION_CODE}"
+        release.initWith(debug)
+        release {
+            buildConfigField "boolean", "LOG_DEBUG", "false"
         }
     }
 
@@ -64,6 +65,14 @@ android {
 
     dataBinding {
         enabled = true
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            if (variant.buildType.name == "release" && output.outputFile != null && output.outputFileName.endsWith('.apk')) {
+                output.outputFileName = "${appName}_v${android.defaultConfig.versionName}_${new Date().format("yyyyMMdd_HHmmss")}.apk"
+            }
+        }
     }
 }
 

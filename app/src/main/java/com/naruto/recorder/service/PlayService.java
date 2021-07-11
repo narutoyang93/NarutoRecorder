@@ -1,18 +1,15 @@
 package com.naruto.recorder.service;
 
-import android.app.NotificationManager;
-import android.app.Service;
-import android.content.Context;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 
-import com.naruto.recorder.R;
 import com.naruto.recorder.activity.PlayActivity;
+import com.naruto.recorder.base.ForegroundService;
 import com.naruto.recorder.utils.MyTool;
 
 import java.io.File;
@@ -24,13 +21,9 @@ import java.io.IOException;
  * @CreateDate 2020/11/17 0017
  * @Note
  */
-public class PlayService extends Service {
-    public static final int NOTIFICATION_ID = 2;
-
+public class PlayService extends ForegroundService {
     private PlayBinder binder = new PlayBinder();
     private MediaPlayer mediaPlayer;
-    private NotificationManager notificationManager;
-    private NotificationCompat.Builder notificationBuilder;
     private String fileName;
 
     @Nullable
@@ -58,13 +51,6 @@ public class PlayService extends Service {
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationBuilder = MyTool.setForegroundService(this, PlayActivity.class, R.mipmap.ic_launcher, NOTIFICATION_ID);
-    }
-
-    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return super.onStartCommand(intent, flags, startId);
     }
@@ -76,6 +62,17 @@ public class PlayService extends Service {
             mediaPlayer = null;
         }
         super.onDestroy();
+    }
+
+    @Override
+    protected int getNotificationId() {
+        return ForegroundService.NOTIFICATION_ID_PLAY;
+    }
+
+    @Override
+    protected PendingIntent getPendingIntent() {
+        Intent intent = new Intent(this, PlayActivity.class);
+        return PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     /**
@@ -144,9 +141,10 @@ public class PlayService extends Service {
          */
         private void updateState(boolean isPlaying) {
             iUpdateUI.updateState(isPlaying);
-            notificationBuilder.setContentTitle(isPlaying ? "正在播放" : "已暂停")  //设置标题
-                    .setContentText(fileName);//设置内容
-            notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+            updateNotification(notificationBuilder -> {
+                notificationBuilder.setContentTitle(isPlaying ? "正在播放" : "已暂停")  //设置标题
+                        .setContentText(fileName);//设置内容
+            });
         }
 
     }

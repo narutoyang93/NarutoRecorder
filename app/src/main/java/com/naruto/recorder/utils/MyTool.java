@@ -2,10 +2,6 @@ package com.naruto.recorder.utils;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -26,14 +22,11 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StyleRes;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
@@ -242,93 +235,6 @@ public class MyTool {
         activity.startActivity(intent);
     }
 
-
-    /**
-     * 创建通知渠道
-     *
-     * @param context
-     * @return
-     */
-    private static String createNotificationChannel(Context context) {
-        final String CHANNEL_ID = context.getPackageName() + ".notification.channel";
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, context.getString(R.string.app_name), importance);
-            channel.setDescription("渠道描述");
-            channel.setSound(null, null);
-            NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.createNotificationChannel(channel);
-        }
-
-        return CHANNEL_ID;
-    }
-
-    /**
-     * 创建NotificationCompat.Builder
-     *
-     * @param service
-     * @param activityClass 点击通知将会打开的Activity
-     * @return
-     */
-    public static NotificationCompat.Builder createNotificationBuilder(Service service, Class<? extends Activity> activityClass) {
-        Intent intent = new Intent(service, activityClass);
-        PendingIntent pendingIntent = PendingIntent.getActivity(service, 0, intent, 0);
-        //创建通知
-        return new NotificationCompat.Builder(service, createNotificationChannel(service))
-                .setContentIntent(pendingIntent)
-                /* .setContentTitle("这是测试通知标题")  //设置标题
-              .setContentText("这是测试通知内容") //设置内容*/
-                .setWhen(System.currentTimeMillis());
-    }
-
-    /**
-     * 设置Service为前台服务
-     *
-     * @param service
-     * @param activityClass  点击通知将会打开的Activity
-     * @param iconRes        通知图标
-     * @param notificationId
-     * @return
-     */
-    public static NotificationCompat.Builder setForegroundService(Service service, Class<? extends Activity> activityClass
-            , @DrawableRes int iconRes, int notificationId, NotificationCompat.Action... actions) {
-        NotificationCompat.Builder builder = createNotificationBuilder(service, activityClass).setSmallIcon(iconRes);
-        if (actions.length > 0) {
-            for (NotificationCompat.Action action : actions) {
-                builder.addAction(action);
-            }
-        }
-        setForegroundService(service, notificationId, builder);
-        return builder;
-    }
-
-    /**
-     * 设置Service为前台服务
-     *
-     * @param service
-     * @param activityClass  点击通知将会打开的Activity
-     * @param notificationId
-     * @param remoteViews
-     * @return
-     */
-    public static NotificationCompat.Builder setForegroundService(Service service, Class<? extends Activity> activityClass
-            , int notificationId, RemoteViews remoteViews) {
-        NotificationCompat.Builder builder = createNotificationBuilder(service, activityClass).setContent(remoteViews);
-        setForegroundService(service, notificationId, builder);
-        return builder;
-    }
-
-    /**
-     * 设置Service为前台服务
-     *
-     * @param service
-     * @param notificationId
-     * @param builder
-     */
-    public static void setForegroundService(Service service, int notificationId, NotificationCompat.Builder builder) {
-        service.startForeground(notificationId, builder.build());
-    }
 
     /**
      * 获取编译时间

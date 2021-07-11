@@ -1,8 +1,6 @@
 package com.naruto.recorder.service;
 
-import android.app.NotificationManager;
-import android.app.Service;
-import android.content.Context;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.media.MediaRecorder;
 import android.os.Binder;
@@ -14,12 +12,10 @@ import android.text.format.DateFormat;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
-import androidx.core.app.NotificationCompat;
 
 import com.naruto.recorder.activity.MainActivity;
-import com.naruto.recorder.R;
+import com.naruto.recorder.base.ForegroundService;
 import com.naruto.recorder.utils.Calculagraph;
-import com.naruto.recorder.utils.MyTool;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,33 +24,19 @@ import java.util.Locale;
 
 import static android.os.Environment.DIRECTORY_DCIM;
 
-public class RecordService extends Service {
+public class RecordService extends ForegroundService {
     public static final int STATE_READY = 0;//就绪
     public static final int STATE_RECORDING = 1;//录音中
     public static final int STATE_PAUSE = 2;//暂停
 
-    public static final int NOTIFICATION_ID = 1;
     private static final String DEFAULT_SAVE_FOLDER = Environment.getExternalStoragePublicDirectory(DIRECTORY_DCIM).getAbsolutePath() + "/sound record/";
     private static final String DEFAULT_SUFFIX = ".m4a";
     private RecordBinder binder = new RecordBinder();
     private MediaRecorder mediaRecorder;
     private Calculagraph calculagraph;//计时器
-    private static final String TAG = "RecordService";
     private String fileName;
     private int state = STATE_READY;
-    private NotificationManager notificationManager;
-    private NotificationCompat.Builder notificationBuilder;
     private int lastSecondValue = -1;//上一次通知时的秒值，同一秒内只通知一次
-
-    public RecordService() {
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationBuilder = MyTool.setForegroundService(this, MainActivity.class, R.mipmap.ic_launcher, NOTIFICATION_ID);
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -75,6 +57,17 @@ public class RecordService extends Service {
         }
         if (calculagraph != null) calculagraph.destroy();
         super.onDestroy();
+    }
+
+    @Override
+    protected int getNotificationId() {
+        return ForegroundService.NOTIFICATION_ID_RECORD;
+    }
+
+    @Override
+    protected PendingIntent getPendingIntent() {
+        Intent intent = new Intent(this, MainActivity.class);
+        return PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     /**
@@ -120,8 +113,8 @@ public class RecordService extends Service {
                     protected void updateUI(int hours, int minutes, int seconds, int milliseconds) {
                         IUpdateUI.updateCalculagraph(hours, minutes, seconds, milliseconds);
                         if (lastSecondValue == seconds) return;//忽略本次通知
-                        notificationBuilder.setContentText(String.format("%02d:%02d:%02d", hours, minutes, seconds));//更新录音时长
-                        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+                        //更新录音时长
+                        updateNotification(notificationBuilder -> notificationBuilder.setContentText(String.format("%02d:%02d:%02d", hours, minutes, seconds)));
                     }
                 };
                 /* ④开始 */
@@ -237,15 +230,8 @@ public class RecordService extends Service {
                     stateString = "已就绪";
                     break;
             }
-            notificationBuilder.setContentTitle(stateString); //更新录音状态
-            notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
-            //防止更新冲突导致更新失败
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
-                }
-            }, 123);
+            //更新录音状态
+            updateNotification(notificationBuilder->notificationBuilder.setContentTitle(stateString));
         }
     }
 

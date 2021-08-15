@@ -2,6 +2,7 @@ package com.naruto.recorder.activity;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.util.Pair;
 import android.view.KeyEvent;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.naruto.recorder.Config;
 import com.naruto.recorder.R;
 import com.naruto.recorder.SharedPreferencesHelper;
 import com.naruto.recorder.adapter.FileListAdapter;
@@ -20,11 +22,10 @@ import com.naruto.recorder.databinding.DialogRenameBinding;
 import com.naruto.recorder.databinding.DialogSortBinding;
 import com.naruto.recorder.service.RecordService;
 import com.naruto.recorder.utils.DialogFactory;
+import com.naruto.recorder.utils.FileUtil;
 import com.naruto.recorder.utils.MyTool;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @Purpose 文件列表
@@ -92,15 +93,6 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
 
             @Override
             public void play(FileListAdapter.FileInfo fileInfo) {
-/*                MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
-                String mime = mimeTypeMap.getMimeTypeFromExtension(path.substring(path.lastIndexOf(".")));
-                Uri uri = MyTool.getFileUri(FileListActivity.this, new File(path));
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.setDataAndType(uri, mime);
-
-                startActivity(intent);*/
                 if (enable) {
                     enable = false;
                     //500毫秒内只能执行一次
@@ -138,9 +130,9 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
 
     public void share(View view) {
         //获取文件uri
-        List<File> files = new ArrayList<>();
+        ArrayList<Uri> files = new ArrayList<>();
         for (FileListAdapter.FileInfo f : adapter.getSelectedItemSet()) {
-            files.add(new File(f.path));
+            files.add(f.uri);
         }
 
         MyTool.shareFile(this, files);
@@ -203,24 +195,23 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
         renameBinding.btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String v = renameBinding.getValue().trim();
-                if (v.equals(waitingRenameItem.name)) {//文件名没有改变，不需要执行操作
+                String newName = renameBinding.getValue().trim();
+                if (newName.equals(waitingRenameItem.name)) {//文件名没有改变，不需要执行操作
                     renameDialog.dismiss();
                     return;
                 }
-                if (!MyTool.checkNewFileName(FileListActivity.this, v)) return;
-                File file;
+                if (!MyTool.checkNewFileName(FileListActivity.this, newName)) return;
                 try {
-                    file = new File(waitingRenameItem.path);
-                    if (file.exists()) {
-                        // TODO: 2020/11/16 0016 处理曾修改保存路径的情况
-                        file.renameTo(new File(RecordService.getNewFilePath(v)));
-                        waitingRenameItem.name = v;
-                        waitingRenameItem.path = file.getAbsolutePath();
+                    String suffix = RecordService.getSuffix();
+                    boolean result = FileUtil.renameFileInExternalPublicSpace(FileUtil.MediaType.AUDIO
+                            , Config.DIR_RECORD, waitingRenameItem.name + suffix, newName + suffix);
+                    if (result) {
+                        waitingRenameItem.name = newName;
                         adapter.notifyItemChanged(adapter.getDataList().indexOf(waitingRenameItem), "name");
                     } else {
-                        toast("文件不存在");
-                        adapter.deleteFiles();
+                        throw new Exception("操作异常");
+/*                        toast("文件不存在");
+                        adapter.deleteFiles();*/
                     }
 
                 } catch (Exception e) {

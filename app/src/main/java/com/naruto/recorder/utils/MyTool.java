@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.media.AudioMetadata;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -13,6 +14,7 @@ import android.text.InputFilter;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
+import android.text.format.Formatter;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.DisplayMetrics;
@@ -39,7 +41,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -211,15 +212,10 @@ public class MyTool {
      * 分享文件
      *
      * @param activity
-     * @param files
+     * @param uris
      */
-    public static void shareFile(Activity activity, List<File> files) {
+    public static void shareFile(Activity activity, ArrayList<Uri> uris) {
         Intent intent = new Intent();
-        //获取文件uri
-        ArrayList<Uri> uris = new ArrayList<>();
-        for (File f : files) {
-            uris.add(getFileUriForShare(activity, f));
-        }
 
         if (uris.size() == 1) {
             intent.setAction(Intent.ACTION_SEND);

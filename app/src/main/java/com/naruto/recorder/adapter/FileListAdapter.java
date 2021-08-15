@@ -1,6 +1,10 @@
 package com.naruto.recorder.adapter;
 
 import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -11,10 +15,12 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.naruto.recorder.Config;
 import com.naruto.recorder.R;
 import com.naruto.recorder.SharedPreferencesHelper;
 import com.naruto.recorder.databinding.ItemFileBinding;
 import com.naruto.recorder.service.RecordService;
+import com.naruto.recorder.utils.FileUtil;
 import com.naruto.recorder.utils.MyTool;
 
 import java.io.File;
@@ -34,6 +40,10 @@ import java.util.Set;
  * @Note
  */
 public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.VH> {
+    private static final FileUtil.MediaType MEDIA_TYPE = FileUtil.MediaType.AUDIO;
+    private static final String fileFolderPath = Config.DIR_RECORD;
+    private static final String SUFFIX = RecordService.getSuffix();
+
     private List<FileInfo> dataList = new ArrayList<>();
     private boolean isEditMode;//是否处于编辑模式
     private Set<FileInfo> selectedItemSet = new HashSet<>();//记录选中项
@@ -47,41 +57,40 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.VH> {
             @Override
             public void run() {
                 //获取录音路径下所有音频文件
-                File folder = new File(RecordService.getSaveFolderPath());
-                String Suffix = RecordService.getSuffix();
-                File[] files = folder.listFiles(new FilenameFilter() {
-                    @Override
-                    public boolean accept(File folder2, String name) {
-                        return name.toLowerCase().endsWith(Suffix);
+                FilenameFilter filenameFilter = (folder2, name) -> name.toLowerCase().endsWith(SUFFIX);
+                FileUtil.MyFileFilter myFileFilter = new FileUtil.MyFileFilter(filenameFilter
+                        , " and " + MediaStore.MediaColumns.DISPLAY_NAME + " like ?", new String[]{"%" + SUFFIX});
+                final MediaPlayer mediaPlayer = new MediaPlayer();
+
+                List<FileInfo> list = FileUtil.getFileInExternalPublicSpace(MEDIA_TYPE, fileFolderPath, myFileFilter, mediaData -> {
+                    FileInfo fileInfo = new FileInfo();
+                    fileInfo.name = mediaData.name.substring(0, mediaData.name.lastIndexOf(SUFFIX));
+                    fileInfo.uri = mediaData.fileUri;
+                    long createTime = 0;
+                    int duration = 0;
+                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                        File file = new File(mediaData.absolutePath);
+                        createTime = file.lastModified();
+                        try {
+                            mediaPlayer.setDataSource(file.getAbsolutePath());
+                            mediaPlayer.prepare();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        duration = mediaPlayer.getDuration();
+                        mediaPlayer.reset();
+                    } else {
+                        //MediaStore取出来的是秒，这里转毫秒
+                        createTime = mediaData.createTime * 1000;
+                        duration = mediaData.duration * 1000;
                     }
+                    Log.d("FileListAdapter", "--->run: createTime=" + mediaData.createTime);
+                    Log.d("FileListAdapter", "--->run: duration=" + mediaData.duration);
+                    fileInfo.createTime = MyTool.formatTime(createTime, "yyyy/MM/dd/HH/mm/ss");
+                    fileInfo.duration = MyTool.getTimeString(duration);//MediaStore取出来的是秒，这里转毫秒
+                    return fileInfo;
                 });
-                if (files.length == 0) {//没有数据
-                    listener.onNoData();
-                    return;
-                }
 
-                MediaPlayer mediaPlayer = new MediaPlayer();
-                //遍历存入dataList
-                String fileName;
-                List<FileInfo> list = new ArrayList<>();
-                for (File file : files) {
-                    if (!file.isFile()) continue;
-                    FileInfo info = new FileInfo();
-                    fileName = file.getName();
-                    info.name = fileName.substring(0, fileName.lastIndexOf(Suffix));
-                    info.path = file.getAbsolutePath();
-                    info.createTime = MyTool.formatTime(file.lastModified(), "yyyy/MM/dd/HH/mm/ss");
-
-                    try {
-                        mediaPlayer.setDataSource(file.getAbsolutePath());
-                        mediaPlayer.prepare();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    info.duration = MyTool.getTimeString(mediaPlayer.getDuration());
-                    mediaPlayer.reset();
-                    list.add(info);
-                }
                 mediaPlayer.release();
                 dataList = list;
                 //排序
@@ -291,17 +300,12 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.VH> {
      * @param position
      */
     public void deleteData(int position) {
-        try {
-            File file = new File(getData(position).path);
-            if (file.exists()) {
-                file.delete();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
+        FileInfo fileInfo = getData(position);
+        boolean isSuccess = FileUtil.deleteFileInExternalPublicSpace(MEDIA_TYPE, fileFolderPath, fileInfo.name + SUFFIX);
+        if (isSuccess) {
+            dataList.remove(position);
+            notifyItemRemoved(position);
         }
-        dataList.remove(position);
-        notifyItemRemoved(position);
     }
 
     public boolean isEditMode() {
@@ -329,7 +333,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.VH> {
      */
     public class FileInfo {
         public String name;
-        public String path;
+        public Uri uri;
         public String createTime;
         public String duration;
     }

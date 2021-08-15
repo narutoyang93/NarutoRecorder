@@ -1,28 +1,38 @@
 package com.naruto.recorder.base;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.SparseArray;
+import android.provider.Settings;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.naruto.recorder.MyApplication;
 import com.naruto.recorder.R;
 import com.naruto.recorder.utils.DialogFactory;
 import com.naruto.recorder.utils.statusbar.StatusBarUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import java.util.Map;
 
 /**
  * @Purpose
@@ -34,8 +44,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     public AlertDialog loadingDialog;//加载弹窗
     protected View rootView;//根布局，即getLayoutRes()返回的布局
     protected View titleBar;//标题栏
-    protected Toast toast;
-    private SparseArray<RequestPermissionsCallBack> permissionsCallBackSparseArray = new SparseArray<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,12 +175,48 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void toast(String message) {
-        if (toast == null) {
-            toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
-        } else {
-            toast.setText(message);
+        MyApplication.toast(message);
+    }
+
+    /**
+     * 隐藏软键盘
+     */
+    public void hideSoftKeyboard() {
+        View view = getCurrentFocus();
+        if (view == null) {
+            return;
         }
-        toast.show();
+        InputMethodManager inputMethodManager = (InputMethodManager) getApplicationContext().getSystemService(INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+
+    /**
+     * 监听软键盘显示或隐藏
+     *
+     * @param listener
+     */
+    protected void setSoftKeyboardListener(final SoftKeyboardListener listener) {
+        rootView.post(new Runnable() {
+            @Override
+            public void run() {
+                rootView.getViewTreeObserver().addOnGlobalLayoutListener(
+                        new ViewTreeObserver.OnGlobalLayoutListener() {
+                            @Override
+                            public void onGlobalLayout() {
+                                Rect r = new Rect();
+                                rootView.getWindowVisibleDisplayFrame(r);
+                                int screenHeight = rootView.getHeight();
+                                int keyboardHeight = screenHeight - (r.bottom);
+                                if (keyboardHeight > 200) {
+                                    listener.onShow(keyboardHeight);//软键盘显示
+                                } else {
+                                    listener.onHide(); //软键盘隐藏
+                                }
+                            }
+
+                        });
+            }
+        });
     }
 
     /**
@@ -196,56 +240,139 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    public void startActivity(Class<? extends Activity> activityClass) {
+        startActivity(new Intent(this, activityClass));
+    }
 
     /**
-     * 申请权限
+     * 检查并申请权限
      *
-     * @param permissions
      * @param callBack
      */
-    public void requestPermissions(String[] permissions, int requestCode, RequestPermissionsCallBack callBack) {
-        if (Build.VERSION.SDK_INT < 23) {//6.0以下系统无需动态申请权限
+    public void doWithPermission(RequestPermissionsCallBack callBack) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {//6.0以下系统无需动态申请权限
             if (callBack != null) callBack.onGranted();
             return;
         }
-
-        List<String> requestPermissionsList = new ArrayList<>();//记录需要申请的权限
-        for (String p : permissions) {
-            if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) {//未授权，记录下来
-                requestPermissionsList.add(p);
-            }
-        }
-        if (requestPermissionsList.isEmpty()) {//已授权
-            if (callBack != null) callBack.onGranted();
+        //检查权限
+        List<String> requestPermissionsList = checkPermissions(callBack.permissions);//记录需要申请的权限
+        if (requestPermissionsList.isEmpty()) {//均已授权
+            callBack.onGranted();
         } else {//申请
             String[] requestPermissionsArray = requestPermissionsList.toArray(new String[requestPermissionsList.size()]);
-            permissionsCallBackSparseArray.put(requestCode, callBack);
-            ActivityCompat.requestPermissions(this, requestPermissionsArray, requestCode);
+            requestPermissions(requestPermissionsArray, result -> {
+                        List<String> refuseList = new ArrayList<>();//被拒绝的权限
+                        List<String> shouldShowReasonList = new ArrayList<>();//需要提示申请理由的权限，即没有被设置“不再询问”的权限
+                        String permission;
+                        for (Map.Entry<String, Boolean> entry : result.entrySet()) {
+                            if (entry.getValue()) continue;
+                            refuseList.add(permission = entry.getKey());
+                            if (shouldShowRequestPermissionRationale(permission))
+                                shouldShowReasonList.add(permission);
+                        }
+                        if (refuseList.isEmpty()) {//全部已授权
+                            callBack.onGranted();
+                        } else {//被拒绝
+                            if (TextUtils.isEmpty(callBack.requestPermissionReason))
+                                callBack.onDenied(this);//直接执行拒绝后的操作
+                            else {//弹窗
+                                if (shouldShowReasonList.isEmpty()) //被设置“不再询问”
+                                    showGoToSettingPermissionDialog(callBack);//弹窗引导前往设置页面
+                                else
+                                    showPermissionRequestReasonDialog(callBack);//弹窗显示申请原因并重新请求权限
+                            }
+                        }
+                    }
+            );
         }
     }
 
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        RequestPermissionsCallBack callBack = permissionsCallBackSparseArray.get(requestCode);
-        permissionsCallBackSparseArray.remove(requestCode);
-        boolean isAllGranted = true;//是否全部已授权
-        for (int result : grantResults) {
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                isAllGranted = false;
-                break;
+    /**
+     * startActivityForResult
+     *
+     * @param intent
+     * @param callback
+     */
+    public void startActivityForResult(Intent intent, ActivityResultCallback<ActivityResult> callback) {
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), callback).launch(intent);
+    }
+
+    public void requestPermissions(String[] permissions, ActivityResultCallback<Map<String, Boolean>> callback) {
+        registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), callback).launch(permissions);
+    }
+
+
+    /**
+     * 显示引导设置权限弹窗
+     *
+     * @param callback
+     * @return
+     */
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public AlertDialog showGoToSettingPermissionDialog(RequestPermissionsCallBack callback) {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        AlertDialog permissionDialog = DialogFactory.makeGoSettingDialog(this
+                , callback.requestPermissionReason + "，是否前往设置？", intent
+                , () -> callback.onDenied(this)
+                , result -> {
+                    if (checkPermissions(callback.permissions).isEmpty()) {//已获取权限
+                        callback.onGranted();
+                    } else {//被拒绝
+                        callback.onDenied(BaseActivity.this);
+                    }
+                }).first;
+        permissionDialog.show();
+        return permissionDialog;
+    }
+
+    /**
+     * 显示申请权限理由
+     *
+     * @param callback
+     * @return
+     */
+    public AlertDialog showPermissionRequestReasonDialog(RequestPermissionsCallBack callback) {
+        DialogFactory.DialogData dialogData = new DialogFactory.DialogData();
+        dialogData.title = "提示";
+        dialogData.content = callback.requestPermissionReason;
+        dialogData.cancelText = "取消";
+        dialogData.confirmText = "授予";
+        dialogData.cancelListener = v -> callback.onDenied(this);
+        dialogData.confirmListener = v -> doWithPermission(callback);
+        AlertDialog dialog = DialogFactory.makeSimpleDialog(this, dialogData).first;
+        dialog.show();
+        return dialog;
+    }
+
+
+    /**
+     * 检查权限
+     *
+     * @param permissions
+     * @return
+     */
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    protected List<String> checkPermissions(String... permissions) {
+        List<String> list = new ArrayList<>();
+        for (String p : permissions) {
+            if (checkSelfPermission(p) != PackageManager.PERMISSION_GRANTED) {//未授权，记录下来
+                list.add(p);
             }
         }
-        if (isAllGranted) {//全部已授权
-            if (callBack != null) callBack.onGranted();
-        } else {//被拒绝
-            if (callBack == null) {
-                Toast.makeText(this, "授权失败", Toast.LENGTH_SHORT).show();
-            } else {
-                callBack.onDenied(this);
-            }
-        }
+        return list;
+    }
+
+    /**
+     * 启动其他页面
+     *
+     * @param activityClass
+     */
+    protected void launchActivity(Class<? extends Activity> activityClass) {
+        Intent intent = new Intent(this, activityClass);
+        startActivity(intent);
     }
 
     /**
@@ -260,6 +387,26 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     protected abstract void init();
 
+
+    /**
+     * @Purpose 键盘收展监听
+     * @Author Naruto Yang
+     * @CreateDate 2020/5/09 0009
+     * @Note
+     */
+    protected interface SoftKeyboardListener {
+        /**
+         * 弹出
+         */
+        void onShow(int keyboardHeight);
+
+        /**
+         * 收起
+         */
+        void onHide();
+    }
+
+
     /**
      * @Purpose 申请权限后处理接口
      * @Author Naruto Yang
@@ -267,6 +414,18 @@ public abstract class BaseActivity extends AppCompatActivity {
      * @Note
      */
     public static abstract class RequestPermissionsCallBack {
+        public String[] permissions;
+        public String requestPermissionReason;
+
+        public RequestPermissionsCallBack(String requestPermissionReason, String... permissions) {
+            this.permissions = permissions;
+            this.requestPermissionReason = requestPermissionReason;
+        }
+
+        public RequestPermissionsCallBack(String[] permissions) {
+            this(null, permissions);
+        }
+
         /**
          * 已授权
          */
@@ -274,9 +433,12 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         /**
          * 被拒绝
+         *
+         * @param context
          */
         public void onDenied(Context context) {
             Toast.makeText(context, "授权失败", Toast.LENGTH_SHORT).show();
         }
+
     }
 }

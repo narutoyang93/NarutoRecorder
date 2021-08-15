@@ -2,16 +2,21 @@ package com.naruto.recorder.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import com.naruto.recorder.R;
-
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.LayoutRes;
 import androidx.appcompat.app.AlertDialog;
+
+import com.naruto.recorder.InterfaceFactory;
+import com.naruto.recorder.R;
+import com.naruto.recorder.base.BaseActivity;
 
 
 /**
@@ -137,6 +142,42 @@ public class DialogFactory {
             }
         });
         return new Pair<>(dialog, view);
+    }
+
+    /**
+     * 前往设置页面弹窗
+     *
+     * @param activity
+     * @param message
+     * @param intentAction
+     * @param onCancel
+     * @param activityResultCallback
+     * @return
+     */
+    public static Pair<AlertDialog, View> makeGoSettingDialog(BaseActivity activity, String message, String intentAction, InterfaceFactory.SimpleOperation onCancel, ActivityResultCallback<ActivityResult> activityResultCallback) {
+        return makeGoSettingDialog(activity, message, new Intent(intentAction), onCancel, activityResultCallback);
+    }
+
+    /**
+     * 前往设置页面弹窗
+     *
+     * @param activity
+     * @param message
+     * @param intent
+     * @param onCancel
+     * @param activityResultCallback
+     * @return
+     */
+    public static Pair<AlertDialog, View> makeGoSettingDialog(BaseActivity activity, String message, Intent intent, InterfaceFactory.SimpleOperation onCancel, ActivityResultCallback<ActivityResult> activityResultCallback) {
+        DialogFactory.DialogData dialogData = new DialogFactory.DialogData();
+        dialogData.title = "提示";
+        dialogData.content = message;
+        dialogData.confirmText = "去设置";
+        dialogData.cancelListener = v -> onCancel.done();
+        dialogData.confirmListener = v -> {// 跳转GPS设置界面
+            activity.startActivityForResult(intent, activityResultCallback);
+        };
+        return DialogFactory.makeSimpleDialog(activity, dialogData);
     }
 
 

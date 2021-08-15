@@ -1,36 +1,37 @@
 package com.naruto.recorder.service;
 
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.media.MediaRecorder;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Environment;
-import android.os.Handler;
 import android.os.IBinder;
+import android.os.ParcelFileDescriptor;
 import android.text.format.DateFormat;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
+import com.naruto.recorder.Config;
+import com.naruto.recorder.MyApplication;
 import com.naruto.recorder.activity.MainActivity;
 import com.naruto.recorder.base.ForegroundService;
 import com.naruto.recorder.utils.Calculagraph;
+import com.naruto.recorder.utils.FileUtil;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Locale;
-
-import static android.os.Environment.DIRECTORY_DCIM;
 
 public class RecordService extends ForegroundService {
     public static final int STATE_READY = 0;//就绪
     public static final int STATE_RECORDING = 1;//录音中
     public static final int STATE_PAUSE = 2;//暂停
 
-    private static final String DEFAULT_SAVE_FOLDER = Environment.getExternalStoragePublicDirectory(DIRECTORY_DCIM).getAbsolutePath() + "/sound record/";
     private static final String DEFAULT_SUFFIX = ".m4a";
+    private static final FileUtil.MediaType MEDIA_TYPE = FileUtil.MediaType.AUDIO;
+    private static final String FOLDER_PATH = Config.DIR_RECORD;
+
     private RecordBinder binder = new RecordBinder();
     private MediaRecorder mediaRecorder;
     private Calculagraph calculagraph;//计时器
@@ -89,43 +90,37 @@ public class RecordService extends ForegroundService {
         public void start() {
             if (mediaRecorder == null) mediaRecorder = new MediaRecorder();
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);// 设置麦克风
-            /*
-             * ②设置输出文件的格式：THREE_GPP/MPEG-4/RAW_AMR/Default THREE_GPP(3gp格式
-             * ，H263视频/ARM音频编码)、MPEG-4、RAW_AMR(只支持音频且音频编码要求为AMR_NB)
-             */
-            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
-            /* ②设置音频文件的编码：AAC/AMR_NB/AMR_MB/Default 声音的（波形）的采样 */
-            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);//设置输出文件的格式
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);//设置音频文件的编码：AAC/AMR_NB/AMR_MB/Default 声音的（波形）的采样
             mediaRecorder.setAudioChannels(2);
             mediaRecorder.setAudioEncodingBitRate(160000);
             mediaRecorder.setAudioSamplingRate(48000);
 
-            File folder = new File(getSaveFolderPath());
-            if (!folder.exists()) folder.mkdirs();
-            /* ③准备 */
-            fileName = (String) DateFormat.format("yyyyMMdd_HHmmss", Calendar.getInstance(Locale.CHINA));
-            mediaRecorder.setOutputFile(getNewFilePath(fileName));
-            boolean b = true;
-            try {
-                mediaRecorder.prepare();
-                if (calculagraph == null) calculagraph = new Calculagraph() {
-                    @Override
-                    protected void updateUI(int hours, int minutes, int seconds, int milliseconds) {
-                        IUpdateUI.updateCalculagraph(hours, minutes, seconds, milliseconds);
-                        if (lastSecondValue == seconds) return;//忽略本次通知
-                        //更新录音时长
-                        updateNotification(notificationBuilder -> notificationBuilder.setContentText(String.format("%02d:%02d:%02d", hours, minutes, seconds)));
-                    }
-                };
-                /* ④开始 */
-                mediaRecorder.start();
-                calculagraph.start();//计时
-            } catch (IOException e) {
-                b = false;
-                e.printStackTrace();
-            }
-            if (b)
+            fileName = (String) DateFormat.format("yyyyMMdd_HHmmss", Calendar.getInstance(Locale.CHINA)) + getSuffix();
+            FileUtil.createAudioFileInExternalPublicSpace(FOLDER_PATH, fileName, uri -> {
+                ContentResolver resolver = MyApplication.getContext().getContentResolver();
+                try {
+                    ParcelFileDescriptor pfd = resolver.openFileDescriptor(uri, "w");
+                    mediaRecorder.setOutputFile(pfd.getFileDescriptor());
+                    mediaRecorder.prepare();
+                    if (calculagraph == null) calculagraph = new Calculagraph() {
+                        @Override
+                        protected void updateUI(int hours, int minutes, int seconds, int milliseconds) {
+                            IUpdateUI.updateCalculagraph(hours, minutes, seconds, milliseconds);
+                            if (lastSecondValue == seconds) return;//忽略本次通知
+                            //更新录音时长
+                            updateNotification(notificationBuilder -> notificationBuilder.setContentText(String.format("%02d:%02d:%02d", hours, minutes, seconds)));
+                        }
+                    };
+                    mediaRecorder.start();//开始
+                    calculagraph.start();//计时
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    MyApplication.toast("录音文件异常");
+                    return;
+                }
                 updateState(state = STATE_RECORDING);
+            });
         }
 
         @RequiresApi(api = Build.VERSION_CODES.N)
@@ -172,28 +167,24 @@ public class RecordService extends ForegroundService {
          * @param newName 新文件名
          */
         public void save(String newName) {
-            boolean b = true;
-
             try {
                 mediaRecorder.stop();
                 mediaRecorder.release();
                 mediaRecorder = null;
                 if (!fileName.equals(newName)) {//重命名
-                    File old = new File(getNewFilePath(fileName));
-                    old.renameTo(new File(getNewFilePath(newName)));
+                    if (!FileUtil.renameFileInExternalPublicSpace(MEDIA_TYPE, FOLDER_PATH, fileName, newName))
+                        throw new Exception("重命名失败");
                 }
-            } catch (IllegalStateException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
-                b = false;
                 IUpdateUI.showDialog("保存异常");
                 mediaRecorder.reset();
                 mediaRecorder.release();
                 mediaRecorder = null;
+                return;
             }
 
-            if (b) {
-                Toast.makeText(RecordService.this, "保存成功", Toast.LENGTH_SHORT).show();
-            }
+            Toast.makeText(RecordService.this, "保存成功", Toast.LENGTH_SHORT).show();
             reset();
         }
 
@@ -205,7 +196,7 @@ public class RecordService extends ForegroundService {
                 mediaRecorder.stop();
                 mediaRecorder.release();
                 mediaRecorder = null;
-                new File(getNewFilePath(fileName)).delete();
+                FileUtil.deleteFileInExternalPublicSpace(MEDIA_TYPE, FOLDER_PATH, fileName);
             } catch (IllegalStateException e) {
                 e.printStackTrace();
                 mediaRecorder.reset();
@@ -231,24 +222,12 @@ public class RecordService extends ForegroundService {
                     break;
             }
             //更新录音状态
-            updateNotification(notificationBuilder->notificationBuilder.setContentTitle(stateString));
+            updateNotification(notificationBuilder -> notificationBuilder.setContentTitle(stateString));
         }
-    }
-
-    public static String getSaveFolderPath() {
-        return DEFAULT_SAVE_FOLDER;
     }
 
     public static String getSuffix() {
         return DEFAULT_SUFFIX;
-    }
-
-    /**
-     * @param fileName 不含后缀
-     * @return
-     */
-    public static String getNewFilePath(String fileName) {
-        return getSaveFolderPath() + fileName + getSuffix();
     }
 
     /**

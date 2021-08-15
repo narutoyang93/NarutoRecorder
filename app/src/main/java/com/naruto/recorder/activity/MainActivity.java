@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.naruto.recorder.R;
 import com.naruto.recorder.base.DataBindingActivity;
 import com.naruto.recorder.databinding.ActivityMainBinding;
@@ -30,8 +29,6 @@ import com.naruto.recorder.utils.MyTool;
  * @Note
  */
 public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
-    public static final int REQUEST_CODE_PERMISSION_RECODE = 100;
-    public static final int REQUEST_CODE_PERMISSION_SHOW_FILE = 101;
     private int state = 0;//状态
     private RecordService.RecordBinder binder;
     private ServiceConnection connection;
@@ -107,15 +104,11 @@ public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
      * 开始
      */
     public void start() {
-        requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_RECODE, new RequestPermissionsCallBack() {
+        doWithPermission(new RequestPermissionsCallBack(null
+                , Manifest.permission.RECORD_AUDIO) {
             @Override
             public void onGranted() {
                 Intent intent = new Intent(MainActivity.this, RecordService.class);
-/*        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            startForegroundService(intent);
-        } else {
-            startService(intent);
-        }*/
                 bindService(intent, connection, BIND_AUTO_CREATE);
             }
         });
@@ -238,12 +231,16 @@ public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
     }
 
     public void showFileList(View view) {
-        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_SHOW_FILE, new RequestPermissionsCallBack() {
+        RequestPermissionsCallBack callBack = new RequestPermissionsCallBack(null
+                , Manifest.permission.READ_EXTERNAL_STORAGE) {
             @Override
             public void onGranted() {
                 startActivity(new Intent(MainActivity.this, FileListActivity.class));
             }
-        });
+        };
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P)
+            doWithPermission(callBack);
+        else callBack.onGranted();
     }
 
     public void setting(View view) {

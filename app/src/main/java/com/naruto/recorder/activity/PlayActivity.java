@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
@@ -18,9 +18,7 @@ import com.naruto.recorder.service.PlayService;
 import com.naruto.recorder.utils.DialogFactory;
 import com.naruto.recorder.utils.MyTool;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @Purpose 播放
@@ -29,10 +27,12 @@ import java.util.List;
  * @Note
  */
 public class PlayActivity extends DataBindingActivity<ActivityPlayBinding> {
-    private static final String INTENT_KEY_FILE_PATH = "file_path";
+    private static final String INTENT_KEY_FILE_NAME = "fileName";
+    private static final String INTENT_KEY_FILE_URI = "fileUri";
     private static final String INTENT_KEY_DURATION = "duration";
 
-    private String filePath;
+    private Uri fileUri;
+    private String fileName;
     private PlayService.PlayBinder binder;
     private ServiceConnection connection;
     private boolean isPlaying = false;
@@ -44,11 +44,11 @@ public class PlayActivity extends DataBindingActivity<ActivityPlayBinding> {
 
     @Override
     protected void init() {
-        filePath = getIntent().getStringExtra(INTENT_KEY_FILE_PATH);
-        File file = new File(filePath);
-        String filename = file.getName();
-        setTitleBarTitle(filename.substring(0, filename.lastIndexOf(".")));
-        dataBinding.setDuration(getIntent().getStringExtra(INTENT_KEY_DURATION));
+        Intent intent = getIntent();
+        fileUri = intent.getParcelableExtra(INTENT_KEY_FILE_URI);
+        fileName = intent.getStringExtra(INTENT_KEY_FILE_NAME);
+        setTitleBarTitle(fileName);
+        dataBinding.setDuration(intent.getStringExtra(INTENT_KEY_DURATION));
 
         connection = new ServiceConnection() {
             @Override
@@ -109,14 +109,13 @@ public class PlayActivity extends DataBindingActivity<ActivityPlayBinding> {
             }
         });
 
-        Intent intent = new Intent(this, PlayService.class);
-        intent.putExtra("filePath", filePath);
-        bindService(intent, connection, BIND_AUTO_CREATE);
+        //启动服务
+        bindService(PlayService.getLaunchIntent(this, fileUri, fileName), connection, BIND_AUTO_CREATE);
     }
 
     public void share(View view) {
-        List<File> files = new ArrayList<>();
-        files.add(new File(filePath));
+        ArrayList<Uri> files = new ArrayList<>();
+        files.add(fileUri);
         MyTool.shareFile(this, files);
     }
 
@@ -137,7 +136,8 @@ public class PlayActivity extends DataBindingActivity<ActivityPlayBinding> {
      */
     public static void launch(Activity activity, FileListAdapter.FileInfo fileInfo) {
         Intent intent = new Intent(activity, PlayActivity.class);
-        intent.putExtra(INTENT_KEY_FILE_PATH, fileInfo.path);
+        intent.putExtra(INTENT_KEY_FILE_URI, fileInfo.uri);
+        intent.putExtra(INTENT_KEY_FILE_NAME, fileInfo.name);
         intent.putExtra(INTENT_KEY_DURATION, fileInfo.duration);
         activity.startActivity(intent);
     }

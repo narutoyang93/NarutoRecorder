@@ -47,7 +47,7 @@
                 <TextView
                     android:id="@+id/tv_1"
                     style="@style/TextStyle_titleBar"
-                    android:text='@{selectedCount>0?"已选择":"未选择"}'
+                    android:text='@{selectedCount>0?String.format("已选择（%d）",selectedCount):"未选择"}'
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintHorizontal_chainStyle="packed"

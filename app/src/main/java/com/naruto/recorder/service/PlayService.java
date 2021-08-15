@@ -1,8 +1,10 @@
 package com.naruto.recorder.service;
 
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 
@@ -22,6 +24,9 @@ import java.io.IOException;
  * @Note
  */
 public class PlayService extends ForegroundService {
+    private static final String INTENT_KEY_FILE_URI="fileUri";
+    private static final String INTENT_KEY_FILE_NAME="fileName";
+
     private PlayBinder binder = new PlayBinder();
     private MediaPlayer mediaPlayer;
     private String fileName;
@@ -30,10 +35,10 @@ public class PlayService extends ForegroundService {
     @Override
     public IBinder onBind(Intent intent) {
         mediaPlayer = new MediaPlayer();
-        String filePath = intent.getStringExtra("filePath");
-        fileName = filePath.substring(filePath.lastIndexOf(File.separator) + 1, filePath.lastIndexOf("."));
+        Uri fileUri=intent.getParcelableExtra(INTENT_KEY_FILE_URI);
+        fileName = intent.getStringExtra(INTENT_KEY_FILE_NAME);;
         try {
-            mediaPlayer.setDataSource(filePath);
+            mediaPlayer.setDataSource(this,fileUri);
             mediaPlayer.prepare();
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
@@ -162,5 +167,20 @@ public class PlayService extends ForegroundService {
         void updateProgress(String time, int progress);
 
         void showDialog(String message);
+    }
+
+
+    /**
+     *
+     * @param context
+     * @param fileUri
+     * @param fileName
+     * @return
+     */
+    public static Intent getLaunchIntent(Context context,Uri fileUri, String fileName){
+        Intent intent = new Intent(context, PlayService.class);
+        intent.putExtra(INTENT_KEY_FILE_URI, fileUri);
+        intent.putExtra(INTENT_KEY_FILE_NAME, fileName);
+        return intent;
     }
 }

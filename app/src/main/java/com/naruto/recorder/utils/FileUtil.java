@@ -578,20 +578,23 @@ public class FileUtil {
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public static boolean updateFileInExternalPublicSpace(MediaType mediaType, String selection, String[] selectionArgs, ContentValues updateValues) {
         MediaData mediaData = getMediaStoreData(mediaType);
-        ContentResolver resolver = MyApplication.getContext().getContentResolver();
+        List<Uri> uriList = getFileInExternalPublicSpace(mediaData, selection, selectionArgs, null, mediaData1 -> mediaData1.fileUri);
 
-        {//设置IS_PENDING
-            ContentValues cv = new ContentValues();
-            cv.put(MediaStore.Files.FileColumns.IS_PENDING, 1);
-            resolver.update(mediaData.contentUri, cv, selection, selectionArgs);
+        boolean result = true;
+        try {
+            for (Uri uri : uriList) {
+                updateFileInExternalPublicSpace(uri, updateValues);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = false;
         }
+        return result;
+    }
 
-        updateValues.put(MediaStore.Files.FileColumns.IS_PENDING, 0);
-        return resolver.update(
-                mediaData.contentUri,
-                updateValues,
-                selection,
-                selectionArgs) > 0;
+    public static boolean updateFileInExternalPublicSpace(Uri uri, ContentValues updateValues) {
+        return MyApplication.getContext().getContentResolver().update(
+                uri, updateValues, null, null) > 0;
     }
 
     /**

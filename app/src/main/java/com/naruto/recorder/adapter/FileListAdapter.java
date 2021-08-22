@@ -82,12 +82,12 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.VH> {
                     } else {
                         //MediaStore取出来的是秒，这里转毫秒
                         createTime = mediaData.createTime * 1000;
-                        duration = mediaData.duration * 1000;
+                        duration = mediaData.duration;
                     }
-                    Log.d("FileListAdapter", "--->run: createTime=" + mediaData.createTime);
-                    Log.d("FileListAdapter", "--->run: duration=" + mediaData.duration);
+                    Log.d("FileListAdapter", "--->run: createTime=" + createTime);
+                    Log.d("FileListAdapter", "--->run: duration=" + duration);
                     fileInfo.createTime = MyTool.formatTime(createTime, "yyyy/MM/dd/HH/mm/ss");
-                    fileInfo.duration = MyTool.getTimeString(duration);//MediaStore取出来的是秒，这里转毫秒
+                    fileInfo.duration = MyTool.getTimeString(duration);
                     return fileInfo;
                 });
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".activity.MainActivity"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activity.MainActivity">
 
     <data>
 
@@ -27,11 +27,11 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:onClick="about"
                 android:id="@+id/iv_help"
                 android:layout_width="@dimen/dp_30"
                 android:layout_height="@dimen/dp_30"
                 android:layout_gravity="right"
+                android:onClick="about"
                 android:src="@drawable/ic_help" />
         </FrameLayout>
 
@@ -58,8 +58,8 @@
                 android:layout_height="@dimen/dp_50"
                 android:layout_centerVertical="true"
                 android:background="@drawable/ring_thickness_ratio_27"
-                android:padding="@dimen/dp_10"
                 android:onClick="showFileList"
+                android:padding="@dimen/dp_10"
                 android:src="@drawable/ic_list"
                 android:visibility="@{DataBindingUtils.isVisible(state==RecordService.STATE_READY),default=visible}" />
 
@@ -80,8 +80,8 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:background="@drawable/ring_thickness_ratio_27"
-                android:padding="@dimen/dp_10"
                 android:onClick="setting"
+                android:padding="@dimen/dp_10"
                 android:src="@drawable/ic_more" />
         </RelativeLayout>
 
@@ -120,7 +120,7 @@
             android:id="@+id/tv_state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text='@{state==RecordService.STATE_READY?"录音准备中":(state==RecordService.STATE_RECORDING?"正在录音":"录音已暂停")}'
+            android:text='@{state==RecordService.STATE_READY?"录音已就绪":(state==RecordService.STATE_RECORDING?"正在录音":"录音已暂停")}'
             android:textSize="15sp"
             app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
             app:layout_constraintEnd_toEndOf="parent"

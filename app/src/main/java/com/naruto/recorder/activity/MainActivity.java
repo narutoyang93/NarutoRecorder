@@ -169,12 +169,7 @@ public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
     private void showSaveDialog(String fileName) {
         if (saveDialog == null) createSaveDialog();
         saveBinding.setValue(fileName);
-        saveBinding.include.editText.post(new Runnable() {
-            @Override
-            public void run() {
-                saveBinding.include.editText.selectAll();
-            }
-        });
+        showSoftKeyboard(saveBinding.include.editText);
         saveDialog.show();
     }
 

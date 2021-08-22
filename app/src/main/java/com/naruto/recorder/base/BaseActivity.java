@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -176,6 +177,17 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected void toast(String message) {
         MyApplication.toast(message);
+    }
+
+    /**
+     * 显示软键盘
+     */
+    public void showSoftKeyboard(EditText editText) {
+        editText.post(() -> {
+            editText.requestFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        });
     }
 
     /**

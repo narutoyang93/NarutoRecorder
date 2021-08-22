@@ -156,12 +156,7 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
             renameBinding.setValue(waitingRenameItem.name);
             break;
         }
-        renameBinding.include.editText.post(new Runnable() {
-            @Override
-            public void run() {
-                renameBinding.include.editText.selectAll();
-            }
-        });
+        showSoftKeyboard(renameBinding.include.editText);
         renameDialog.show();
     }
 
@@ -208,6 +203,7 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
                     if (result) {
                         waitingRenameItem.name = newName;
                         adapter.notifyItemChanged(adapter.getDataList().indexOf(waitingRenameItem), "name");
+                        toast("保存成功");
                     } else {
                         throw new Exception("操作异常");
 /*                        toast("文件不存在");

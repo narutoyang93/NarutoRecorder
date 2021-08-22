@@ -113,7 +113,6 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/rounded_corner_radius_10dp</item>
-        <item name="android:textColor">@color/theme</item>
     </style>
 
     <dimen name="size_35dp">35dp</dimen>

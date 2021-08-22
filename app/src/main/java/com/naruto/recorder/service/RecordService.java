@@ -35,7 +35,8 @@ public class RecordService extends ForegroundService {
     private RecordBinder binder = new RecordBinder();
     private MediaRecorder mediaRecorder;
     private Calculagraph calculagraph;//计时器
-    private String fileName;
+    private String fileName;//不带后缀
+    private String fullFileName;//完整文件名，带后缀
     private int state = STATE_READY;
     private int lastSecondValue = -1;//上一次通知时的秒值，同一秒内只通知一次
 
@@ -52,7 +53,7 @@ public class RecordService extends ForegroundService {
     @Override
     public void onDestroy() {
         if (mediaRecorder != null) {
-            if (state == STATE_RECORDING) binder.save(fileName);//录音中出现异常，立即保存
+            if (state == STATE_RECORDING) binder.save(fullFileName);//录音中出现异常，立即保存
             mediaRecorder.release();
             mediaRecorder = null;
         }
@@ -96,8 +97,9 @@ public class RecordService extends ForegroundService {
             mediaRecorder.setAudioEncodingBitRate(160000);
             mediaRecorder.setAudioSamplingRate(48000);
 
-            fileName = (String) DateFormat.format("yyyyMMdd_HHmmss", Calendar.getInstance(Locale.CHINA)) + getSuffix();
-            FileUtil.createAudioFileInExternalPublicSpace(FOLDER_PATH, fileName, uri -> {
+            fileName = (String) DateFormat.format("yyyyMMdd_HHmmss", Calendar.getInstance(Locale.CHINA));
+            fullFileName = fileName + getSuffix();
+            FileUtil.createAudioFileInExternalPublicSpace(FOLDER_PATH, fullFileName, uri -> {
                 ContentResolver resolver = MyApplication.getContext().getContentResolver();
                 try {
                     ParcelFileDescriptor pfd = resolver.openFileDescriptor(uri, "w");
@@ -172,7 +174,7 @@ public class RecordService extends ForegroundService {
                 mediaRecorder.release();
                 mediaRecorder = null;
                 if (!fileName.equals(newName)) {//重命名
-                    if (!FileUtil.renameFileInExternalPublicSpace(MEDIA_TYPE, FOLDER_PATH, fileName, newName))
+                    if (!FileUtil.renameFileInExternalPublicSpace(MEDIA_TYPE, FOLDER_PATH, fullFileName, newName + getSuffix()))
                         throw new Exception("重命名失败");
                 }
             } catch (Exception e) {
@@ -196,7 +198,7 @@ public class RecordService extends ForegroundService {
                 mediaRecorder.stop();
                 mediaRecorder.release();
                 mediaRecorder = null;
-                FileUtil.deleteFileInExternalPublicSpace(MEDIA_TYPE, FOLDER_PATH, fileName);
+                FileUtil.deleteFileInExternalPublicSpace(MEDIA_TYPE, FOLDER_PATH, fullFileName);
             } catch (IllegalStateException e) {
                 e.printStackTrace();
                 mediaRecorder.reset();

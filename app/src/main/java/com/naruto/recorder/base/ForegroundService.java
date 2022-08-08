@@ -48,7 +48,7 @@ public abstract class ForegroundService extends Service {
      * @return
      */
     protected NotificationCompat.Builder initNotification() {
-        return ServiceUtils.setForegroundService(this, getPendingIntent(), R.drawable.ic_logo_notification, getNotificationId());
+        return ServiceUtils.setForegroundService(this, getPendingIntent(), R.drawable.ic_logo_notification, getNotificationId(), getNotificationActions());
     }
 
     /**
@@ -72,6 +72,10 @@ public abstract class ForegroundService extends Service {
     int getNotificationId();
 
     protected abstract PendingIntent getPendingIntent();
+
+    protected NotificationCompat.Action[] getNotificationActions() {
+        return null;
+    }
 
     /**
      * 启动前台服务

@@ -2,7 +2,9 @@ package com.naruto.recorder.activity;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Build;
@@ -12,15 +14,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import androidx.databinding.DataBindingUtil;
 
+import com.naruto.recorder.InterfaceFactory;
+import com.naruto.recorder.MyBroadcastReceiver;
 import com.naruto.recorder.R;
 import com.naruto.recorder.base.DataBindingActivity;
 import com.naruto.recorder.databinding.ActivityMainBinding;
 import com.naruto.recorder.databinding.DialogSaveBinding;
 import com.naruto.recorder.service.RecordService;
 import com.naruto.recorder.utils.DialogFactory;
+import com.naruto.recorder.utils.IntentUtil;
 import com.naruto.recorder.utils.MyTool;
+import com.naruto.recorder.utils.NotificationUtil;
 
 /**
  * @Purpose
@@ -29,12 +36,18 @@ import com.naruto.recorder.utils.MyTool;
  * @Note
  */
 public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
+    private static final String ACTION_START = "action_start";
+    private static final String ACTION_PAUSE = "action_pause";
+    private static final String ACTION_STOP = "action_stop";
+    private static final String ACTION_RESUME = "action_resume";
+
     private int state = 0;//状态
     private RecordService.RecordBinder binder;
     private ServiceConnection connection;
     private Dialog saveDialog;//保存弹窗
     private DialogSaveBinding saveBinding;
     private boolean isNeedResumeWhenBack = false;//保存弹窗返回是否需要继续录音（当按下“完成”按钮时正在录音，则返回后需要继续录音）
+    private MyBroadcastReceiver mReceiver = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +105,21 @@ public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
         };
     }
 
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (intent.getCharSequenceExtra("tag") != null)
-            pauseOrResume(null);
+
+        String tag = intent.getStringExtra("tag");
+        if (tag != null) {
+            switch (tag) {
+                case ACTION_START:
+                    pauseOrResume(null);
+                    break;
+                case ACTION_STOP:
+                    complete(null);
+                    break;
+            }
+        }
     }
 
     /**
@@ -108,6 +130,12 @@ public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
                 , Manifest.permission.RECORD_AUDIO) {
             @Override
             public void onGranted() {
+                if (mReceiver == null) {
+                    mReceiver = new MyBroadcastReceiver();
+                    mReceiver.addAction((intent) -> pauseOrResume(null), ACTION_PAUSE, ACTION_RESUME);
+                    mReceiver.addAction((intent) -> complete(null), ACTION_STOP);
+                    mReceiver.register(MainActivity.this);
+                }
                 Intent intent = new Intent(MainActivity.this, RecordService.class);
                 bindService(intent, connection, BIND_AUTO_CREATE);
             }
@@ -221,6 +249,12 @@ public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
         outState.putInt("state", state);
     }
 
+    @Override
+    protected void onDestroy() {
+        if (mReceiver != null) mReceiver.unRegister(this);
+        super.onDestroy();
+    }
+
     public void about(View view) {
         startActivity(new Intent(this, AboutActivity.class));
     }
@@ -241,4 +275,32 @@ public class MainActivity extends DataBindingActivity<ActivityMainBinding> {
     public void setting(View view) {
         startActivity(new Intent(this, SettingActivity.class));
     }
+
+
+    public static void launchAndStartRecording(Context context) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra("tag", ACTION_START);
+        context.startActivity(intent);
+    }
+
+    public static PendingIntent createPendingIntent(Context context, int requestCode, InterfaceFactory.Operation<Intent> operation) {
+        Intent intent = new Intent(context, MainActivity.class);
+        if (operation != null) operation.done(intent);
+        return PendingIntent.getActivity(context, requestCode, intent, IntentUtil.defaultPendingIntentFlag());
+    }
+
+    public static NotificationCompat.Action createPauseActionIntent(Context context) {
+        return NotificationUtil.createAction(context, R.drawable.ic_pause, "暂停", ACTION_PAUSE);
+    }
+
+    public static NotificationCompat.Action createResumeActionIntent(Context context) {
+        return NotificationUtil.createAction(context, R.drawable.ic_play, "继续", ACTION_RESUME);
+    }
+
+    public static NotificationCompat.Action createStopActionIntent(Context context) {
+        int icon = R.drawable.ic_stop;
+        PendingIntent intent = createPendingIntent(context, icon, (i) -> i.putExtra("tag", ACTION_STOP));
+        return new NotificationCompat.Action(icon, "停止", intent);
+    }
+
 }

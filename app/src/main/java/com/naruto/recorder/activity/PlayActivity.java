@@ -2,6 +2,7 @@ package com.naruto.recorder.activity;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
@@ -10,6 +11,9 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 
+import androidx.core.app.NotificationCompat;
+
+import com.naruto.recorder.MyBroadcastReceiver;
 import com.naruto.recorder.R;
 import com.naruto.recorder.adapter.FileListAdapter;
 import com.naruto.recorder.base.DataBindingActivity;
@@ -17,6 +21,7 @@ import com.naruto.recorder.databinding.ActivityPlayBinding;
 import com.naruto.recorder.service.PlayService;
 import com.naruto.recorder.utils.DialogFactory;
 import com.naruto.recorder.utils.MyTool;
+import com.naruto.recorder.utils.NotificationUtil;
 
 import java.util.ArrayList;
 
@@ -31,11 +36,16 @@ public class PlayActivity extends DataBindingActivity<ActivityPlayBinding> {
     private static final String INTENT_KEY_FILE_URI = "fileUri";
     private static final String INTENT_KEY_DURATION = "duration";
 
+    private static final String ACTION_RESUME = "action_resume";
+    private static final String ACTION_PAUSE = "action_pause";
+    private static final String ACTION_STOP = "action_stop";
+
     private Uri fileUri;
     private String fileName;
     private PlayService.PlayBinder binder;
     private ServiceConnection connection;
     private boolean isPlaying = false;
+    private MyBroadcastReceiver mReceiver = null;
 
     @Override
     protected int getLayoutRes() {
@@ -109,6 +119,12 @@ public class PlayActivity extends DataBindingActivity<ActivityPlayBinding> {
             }
         });
 
+        if (mReceiver == null) {
+            mReceiver = new MyBroadcastReceiver();
+            mReceiver.addAction((i) -> playOrPause(null), ACTION_PAUSE, ACTION_RESUME);
+            mReceiver.addAction((i) -> finish(), ACTION_STOP);
+            mReceiver.register(PlayActivity.this);
+        }
         //启动服务
         bindService(PlayService.getLaunchIntent(this, fileUri, fileName), connection, BIND_AUTO_CREATE);
     }
@@ -126,6 +142,24 @@ public class PlayActivity extends DataBindingActivity<ActivityPlayBinding> {
         } else {
             binder.start();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mReceiver != null) mReceiver.unRegister(this);
+        super.onDestroy();
+    }
+
+    public static NotificationCompat.Action createPauseActionIntent(Context context) {
+        return NotificationUtil.createAction(context, R.drawable.ic_pause, "暂停", ACTION_PAUSE);
+    }
+
+    public static NotificationCompat.Action createResumeActionIntent(Context context) {
+        return NotificationUtil.createAction(context, R.drawable.ic_play, "继续", ACTION_RESUME);
+    }
+
+    public static NotificationCompat.Action createStopActionIntent(Context context) {
+        return NotificationUtil.createAction(context, R.drawable.ic_stop, "停止", ACTION_STOP);
     }
 
     /**

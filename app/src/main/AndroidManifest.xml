@@ -22,9 +22,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NarutoRecorder">
+
         <activity
             android:name=".activity.PlayActivity"
-            android:launchMode="singleTask"></activity>
+            android:launchMode="singleTask" />
         <activity android:name=".activity.SettingActivity" />
         <activity
             android:name=".activity.FileListActivity"

@@ -111,9 +111,7 @@ public class FileListActivity extends DataBindingActivity<ActivityFileListBindin
     }
 
     public void newRecord(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("tag", "start record");
-        startActivity(intent);
+        MainActivity.launchAndStartRecording(this);
     }
 
     public void enterEditMode(View view) {

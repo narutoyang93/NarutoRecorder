@@ -71,7 +71,7 @@ public class ServiceUtils {
     public static NotificationCompat.Builder setForegroundService(Service service, PendingIntent pendingIntent
             , @DrawableRes int iconRes, int notificationId, NotificationCompat.Action... actions) {
         NotificationCompat.Builder builder = createNotificationBuilder(service, pendingIntent).setSmallIcon(iconRes);
-        if (actions.length > 0) {
+        if (actions != null && actions.length > 0) {
             for (NotificationCompat.Action action : actions) {
                 builder.addAction(action);
             }

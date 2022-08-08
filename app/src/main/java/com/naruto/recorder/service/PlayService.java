@@ -9,12 +9,12 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
 import com.naruto.recorder.activity.PlayActivity;
 import com.naruto.recorder.base.ForegroundService;
 import com.naruto.recorder.utils.MyTool;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -24,8 +24,8 @@ import java.io.IOException;
  * @Note
  */
 public class PlayService extends ForegroundService {
-    private static final String INTENT_KEY_FILE_URI="fileUri";
-    private static final String INTENT_KEY_FILE_NAME="fileName";
+    private static final String INTENT_KEY_FILE_URI = "fileUri";
+    private static final String INTENT_KEY_FILE_NAME = "fileName";
 
     private PlayBinder binder = new PlayBinder();
     private MediaPlayer mediaPlayer;
@@ -35,10 +35,10 @@ public class PlayService extends ForegroundService {
     @Override
     public IBinder onBind(Intent intent) {
         mediaPlayer = new MediaPlayer();
-        Uri fileUri=intent.getParcelableExtra(INTENT_KEY_FILE_URI);
-        fileName = intent.getStringExtra(INTENT_KEY_FILE_NAME);;
+        Uri fileUri = intent.getParcelableExtra(INTENT_KEY_FILE_URI);
+        fileName = intent.getStringExtra(INTENT_KEY_FILE_NAME);
         try {
-            mediaPlayer.setDataSource(this,fileUri);
+            mediaPlayer.setDataSource(this, fileUri);
             mediaPlayer.prepare();
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
@@ -147,7 +147,19 @@ public class PlayService extends ForegroundService {
         private void updateState(boolean isPlaying) {
             iUpdateUI.updateState(isPlaying);
             updateNotification(notificationBuilder -> {
-                notificationBuilder.setContentTitle(isPlaying ? "正在播放" : "已暂停")  //设置标题
+                String title;
+                NotificationCompat.Action action;
+                if (isPlaying) {
+                    title = "正在播放";
+                    action = PlayActivity.createPauseActionIntent(PlayService.this);
+                } else {
+                    title = "已暂停";
+                    action = PlayActivity.createResumeActionIntent(PlayService.this);
+                }
+                notificationBuilder.setContentTitle(title)  //设置标题
+                        .clearActions()
+                        .addAction(action)
+                        .addAction(PlayActivity.createStopActionIntent(PlayService.this))
                         .setContentText(fileName);//设置内容
             });
         }
@@ -171,13 +183,12 @@ public class PlayService extends ForegroundService {
 
 
     /**
-     *
      * @param context
      * @param fileUri
      * @param fileName
      * @return
      */
-    public static Intent getLaunchIntent(Context context,Uri fileUri, String fileName){
+    public static Intent getLaunchIntent(Context context, Uri fileUri, String fileName) {
         Intent intent = new Intent(context, PlayService.class);
         intent.putExtra(INTENT_KEY_FILE_URI, fileUri);
         intent.putExtra(INTENT_KEY_FILE_NAME, fileName);

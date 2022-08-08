@@ -12,6 +12,7 @@ import android.text.format.DateFormat;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat.Action;
 
 import com.naruto.recorder.Config;
 import com.naruto.recorder.MyApplication;
@@ -20,6 +21,7 @@ import com.naruto.recorder.base.ForegroundService;
 import com.naruto.recorder.utils.Calculagraph;
 import com.naruto.recorder.utils.FileUtil;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -68,8 +70,7 @@ public class RecordService extends ForegroundService {
 
     @Override
     protected PendingIntent getPendingIntent() {
-        Intent intent = new Intent(this, MainActivity.class);
-        return PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return MainActivity.createPendingIntent(this, 10, null);
     }
 
     /**
@@ -153,6 +154,7 @@ public class RecordService extends ForegroundService {
             if (state == STATE_RECORDING && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 pause();
             }
+
             IUpdateUI.askForSave(fileName);
         }
 
@@ -212,19 +214,31 @@ public class RecordService extends ForegroundService {
         private void updateState(int state0) {
             IUpdateUI.updateState(state = state0);
             String stateString;
+            ArrayList<Action> mActions = new ArrayList<>();
             switch (state0) {
                 case STATE_PAUSE:
                     stateString = "已暂停";
+                    mActions.add(MainActivity.createResumeActionIntent(RecordService.this));
+                    mActions.add(MainActivity.createStopActionIntent(RecordService.this));
                     break;
                 case STATE_RECORDING:
                     stateString = "正在录音";
+                    mActions.add(MainActivity.createPauseActionIntent(RecordService.this));
+                    mActions.add(MainActivity.createStopActionIntent(RecordService.this));
                     break;
                 default:
                     stateString = "已就绪";
                     break;
             }
             //更新录音状态
-            updateNotification(notificationBuilder -> notificationBuilder.setContentTitle(stateString));
+            updateNotification(notificationBuilder -> {
+                notificationBuilder.setContentTitle(stateString);
+                //通知上的按钮
+                notificationBuilder.clearActions();
+                for (Action action : mActions) {
+                    notificationBuilder.addAction(action);
+                }
+            });
         }
     }
 
